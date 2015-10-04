@@ -1,0 +1,16 @@
+.root {
+  main-bg: #BBB;
+  main-font-color: #800080;
+}
+
+.button {
+  -fx-font-weight: bold;
+}
+
+.text-area {
+  -fx-text-fill: main-font-color;
+}
+
+.text-area .content {
+  -fx-background-color: main-bg;
+}

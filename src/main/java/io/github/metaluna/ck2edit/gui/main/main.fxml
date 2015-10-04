@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.metaluna.ck2edit.gui.main.MainPresenter">
+   <top>
+      <MenuBar BorderPane.alignment="TOP_LEFT">
+        <menus>
+          <Menu text="_File">
+            <items>
+                  <MenuItem onAction="#onOpenFile" text="_Open Mod..." />
+              <MenuItem disable="true" text="_Quit" />
+            </items>
+          </Menu>
+          <Menu text="_Edit">
+            <items>
+              <MenuItem disable="true" text="Delete" />
+            </items>
+          </Menu>
+          <Menu text="_Help">
+            <items>
+              <MenuItem disable="true" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

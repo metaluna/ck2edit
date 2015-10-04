@@ -1,0 +1,5 @@
+property = {
+  li1a li1b
+  li2a li2b
+}
+property2 = value2
