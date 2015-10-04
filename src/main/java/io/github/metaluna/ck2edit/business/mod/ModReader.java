@@ -49,7 +49,8 @@ class ModReader {
   public Mod read() {
     LOG.entry();
     Objects.requireNonNull(modFile);
-    Mod result = parse();
+    Node root = parser.parse();
+    Mod result = parse(root);
     return LOG.exit(result);
   }
 
@@ -62,11 +63,34 @@ class ModReader {
     LOG.exit();
   }
 
+  // ---vvv--- PRIVATE ---vvv---
+  private static final Logger LOG = LogManager.getFormatterLogger();
+  private static final Map<String, AttributeSetter<?>> ATTRIBUTE_MAP = new HashMap<>();
+
+  private final File modFile;
+  private final Parser parser;
+
+  private enum ValueType {
+
+    SIMPLE, LIST
+  };
+
+  private class AttributeSetter<T> {
+
+    final BiConsumer<Mod, T> setter;
+    final ValueType type;
+
+    AttributeSetter(BiConsumer<Mod, T> setter, ValueType valueType) {
+      this.setter = setter;
+      this.type = valueType;
+    }
+  }
+
   private void initializeAttributeMap() {
     if (!ATTRIBUTE_MAP.isEmpty()) {
       return;
     }
-    
+
     ATTRIBUTE_MAP.put("name", new AttributeSetter<>(Mod::setName, ValueType.SIMPLE));
     ATTRIBUTE_MAP.put("path", new AttributeSetter<>(Mod::setPath, ValueType.SIMPLE));
     ATTRIBUTE_MAP.put("user_dir", new AttributeSetter<>(Mod::setUserDir, ValueType.SIMPLE));
@@ -77,44 +101,30 @@ class ModReader {
     ATTRIBUTE_MAP.put("dependencies", new AttributeSetter<>(Mod::setDependencies, ValueType.LIST));
   }
 
-  // ---vvv--- PRIVATE ---vvv---
-  private static final Logger LOG = LogManager.getFormatterLogger();
-  private static final Map<String, AttributeSetter<?>> ATTRIBUTE_MAP = new HashMap<>();
-  
-  private final File modFile;
-  private final Parser parser;
-
-  private enum ValueType { SIMPLE, LIST };
-  
-  private class AttributeSetter<T> {
-    final BiConsumer<Mod, T> setter;
-    final ValueType type;
-    AttributeSetter(BiConsumer<Mod, T> setter, ValueType valueType) {
-      this.setter = setter;
-      this.type = valueType;
-    }
-  }
-
   @SuppressWarnings("unchecked")
-  private Mod parse() {
+  private Mod parse(Node root) {
     LOG.entry();
     final Mod result = new ModImpl();
-    Node root = parser.parse();
 
-    for (Node node : root.getChildren()) {
-      AttributeSetter attribute = ATTRIBUTE_MAP.get(node.getName());
-      if (attribute != null) {
-        final Object nameValue;
-        if (attribute.type == ValueType.SIMPLE) {
-          nameValue = getSimpleValue(node);
-        } else {
-          nameValue = getListValue(node);
-        }
-        attribute.setter.accept(result, nameValue);
-      }
-    }
+    root.getChildren().parallelStream()
+            .filter(n -> ATTRIBUTE_MAP.containsKey(n.getName()))
+            .forEach(n -> {
+              AttributeSetter attribute = ATTRIBUTE_MAP.get(n.getName());
+              Object nameValue = fetchAttributeValue(attribute, n);
+              attribute.setter.accept(result, nameValue);
+            });
 
     return LOG.exit(result);
+  }
+
+  private Object fetchAttributeValue(AttributeSetter<?> attribute, Node n) {
+    final Object result;
+    if (attribute.type == ValueType.SIMPLE) {
+      result = getSimpleValue(n);
+    } else {
+      result = getListValue(n);
+    }
+    return result;
   }
 
   private List<String> getListValue(Node node) {
