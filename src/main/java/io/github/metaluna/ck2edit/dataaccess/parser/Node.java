@@ -38,6 +38,17 @@ import org.apache.logging.log4j.Logger;
 public class Node {
 
   /**
+   * @return a new root node
+   */
+  public static Node createRoot() {
+    return new Node(ROOT_NAME, true);
+  }
+  
+  public static Node create(String name) {
+    return new Node(name);
+  }
+
+  /**
    * @return the name of this node
    */
   public String getName() {
@@ -120,6 +131,33 @@ public class Node {
     return LOG.exit(result.toString());
   }
 
+  /**
+   * Adds a child node to this node.
+   * @param child the child node
+   * @return a reference to this node
+   */
+  public Node addChild(Node child) {
+    LOG.entry(this.name, child);
+    Objects.requireNonNull(child);
+
+    if (this.children == null) {
+      this.children = new ArrayList<>();
+    }
+    this.children.add(child);
+    return LOG.exit(this);
+  }
+
+  /**
+   * Adds a new node with the specified name to this node.
+   * @param name the name of the node
+   * @return a reference to this node
+   */
+  public Node addChild(String name) {
+    LOG.entry(name);
+    this.addChild(new Node(name));
+    return LOG.exit(this);
+  }
+  
   @Override
   public String toString() {
     LOG.entry();
@@ -137,29 +175,15 @@ public class Node {
   }
   
   // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  static Node createRoot() {
-    return new Node(ROOT_NAME, true);
-  }
-
   Node(String name) {
     this(name, false);
-  }
-
-  void addChild(Node child) {
-    LOG.entry(this.name, child);
-    Objects.requireNonNull(child);
-
-    if (this.children == null) {
-      this.children = new ArrayList<>();
-    }
-    this.children.add(child);
-    LOG.exit();
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
   private static final String ROOT_NAME = "[ROOT]";
   private static final String INDENTATION_PREFIX = "\t";
+  private static final String NEW_LINE = "\r\n";
 
   private final String name;
   private final boolean isRoot;
@@ -198,8 +222,8 @@ public class Node {
    */
   private void printAsSimpleValue(StringBuilder builder) {
     LOG.entry(builder);
-    builder.append(this.children.get(0).getName());
-    builder.append("\n");
+    builder.append(this.children.get(0).getName())
+            .append(NEW_LINE);
     LOG.exit();
   }
 
@@ -214,7 +238,7 @@ public class Node {
   private void printAsComplexValue(StringBuilder builder, int indentations) {
     LOG.entry(builder, indentations);
     // opening brackets
-    builder.append("{ \n");
+    builder.append("{ ").append(NEW_LINE);
 
     // print children
     int nextIndentation = indentations + 1;
@@ -224,7 +248,7 @@ public class Node {
     );
     // closing brackets
     indent(builder, indentations);
-    builder.append("}\n");
+    builder.append("}").append(NEW_LINE);
     LOG.exit();
   }
 
@@ -240,7 +264,8 @@ public class Node {
                     .map(c -> c.getName())
                     .collect(Collectors.joining(" "))
             )
-            .append(" }\n");
+            .append(" }")
+            .append(NEW_LINE);
     LOG.exit();
   }
 

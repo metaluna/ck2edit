@@ -5,4 +5,4 @@ replace_path = "events"
 replace_path = "music"
 picture = "completemod.tga"
 tags = { "Tag 1" "Tag 2" }
-dependencies = { "Parent Mod" }
+dependencies = { "Parent Mod 1" "Parent Mod 2" }

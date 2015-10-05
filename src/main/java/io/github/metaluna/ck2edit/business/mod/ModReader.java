@@ -117,14 +117,15 @@ class ModReader {
     return LOG.exit(result);
   }
 
-  private Object fetchAttributeValue(AttributeSetter<?> attribute, Node n) {
+  private Object fetchAttributeValue(AttributeSetter<?> attribute, Node node) {
+    LOG.entry(attribute, node);
     final Object result;
     if (attribute.type == ValueType.SIMPLE) {
-      result = getSimpleValue(n);
+      result = getSimpleValue(node);
     } else {
-      result = getListValue(n);
+      result = getListValue(node);
     }
-    return result;
+    return LOG.exit(result);
   }
 
   private List<String> getListValue(Node node) {

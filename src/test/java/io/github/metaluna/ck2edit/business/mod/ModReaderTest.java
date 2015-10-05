@@ -35,9 +35,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class ModReaderTest {
-  
+
   private ModReader modReader;
-  
+
   @Before
   public void setUp() {
   }
@@ -55,20 +55,27 @@ public class ModReaderTest {
     assertThat(mod.getReplacePaths(), hasItem("\"music\""));
     assertThat(mod.getTags(), hasItem("\"Tag 1\""));
     assertThat(mod.getTags(), hasItem("\"Tag 2\""));
-    assertThat(mod.getDependencies(), contains("\"Parent Mod\""));
+    assertThat(mod.getDependencies(), hasItem("\"Parent Mod 1\""));
+    assertThat(mod.getDependencies(), hasItem("\"Parent Mod 2\""));
   }
 
-  // ---vvv--- PRIVATE ---vvv---
-  private ModReader parse(String file) {
-URL resourceUrl = getClass().getResource("/reader/mod/" + file);
+  public static Path fetchFile(String file) {
+    URL resourceUrl = ModReaderTest.class.getResource("/reader/mod/" + file);
     Path path = null;
     try {
       path = Paths.get(resourceUrl.toURI());
     } catch (URISyntaxException ex) {
       fail(String.format("Unable to load file '%s'", resourceUrl.toString()));
     }
+    return path;
+  }
+
+  // ---vvv--- PRIVATE ---vvv---
+  private ModReader parse(String file) {
+    Path path = fetchFile(file);
     Parser parser = new ParserFactory().fromFile(path);
     return new ModReader(path.toFile(), parser);
   }
-  
+
+
 }

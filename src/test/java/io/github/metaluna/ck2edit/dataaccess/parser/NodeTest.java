@@ -89,7 +89,7 @@ public class NodeTest {
   
   @Test(expected = NullPointerException.class)
   public void doesNotAddNullChild() {
-    node.addChild(null);
+    node.addChild((Node) null);
   }
 
   @Test

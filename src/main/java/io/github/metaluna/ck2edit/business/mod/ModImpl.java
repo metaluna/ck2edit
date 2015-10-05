@@ -23,6 +23,7 @@
  */
 package io.github.metaluna.ck2edit.business.mod;
 
+import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,6 +142,21 @@ class ModImpl implements Mod {
     this.dependencies.add(dependency);
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+            .omitNullValues()
+            .add("name", name)
+            .add("path", path)
+            .add("user_dir", userDir)
+            .add("archive", archive)
+            .add("replace_paths", replacePaths)
+            .add("dependencies", dependencies)
+            .add("picture", picture)
+            .add("tags", tags)
+            .toString();
+  }
+  
   // ---vvv--- PRIVATE ---vvv---
   /** required */
   private String name;
