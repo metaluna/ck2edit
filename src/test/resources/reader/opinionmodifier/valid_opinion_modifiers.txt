@@ -1,0 +1,16 @@
+opinion_minimal_features = {
+  opinion = 100
+}
+
+opinion_all_features = {
+  opinion = -10
+  months = 12
+  prison_reason = yes
+  banish_reason = yes
+  execute_reason = yes
+  revoke_reason = yes
+  divorce_reason = yes
+  inherit = yes
+  enemy = yes
+  crime = yes
+}

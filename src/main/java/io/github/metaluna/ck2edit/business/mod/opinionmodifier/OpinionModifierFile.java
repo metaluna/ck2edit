@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -21,46 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod;
+
+package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
 import io.github.metaluna.ck2edit.business.mod.ModFile;
 import java.nio.file.Path;
-import java.util.function.Consumer;
-import javafx.event.ActionEvent;
-import javafx.scene.control.TreeCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ModTreeCell extends TreeCell<Object> {
+/**
+ * File containing a number of opinion modifiers.
+ */
+public class OpinionModifierFile implements ModFile {
 
-  public ModTreeCell(Consumer<ModFile> openHandler) {
-    this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-      if (event.getClickCount() == 2) {
-        open(openHandler);
-      }
-    });
-
+  /**
+   * Constructor
+   * @param path the path to the file 
+   */
+  public OpinionModifierFile(Path path) {
+    this.path = Objects.requireNonNull(path);
+    this.opinionModifiers = new ArrayList<>();
   }
 
   @Override
-  protected void updateItem(Object item, boolean empty) {
-    super.updateItem(item, empty);
-    LOG.entry(item, empty);
-    setText(item == null ? "" : item.toString());
-    LOG.exit();
+  public String getName() {
+    return this.path.getFileName().toString();
+  }
+  
+  @Override
+  public String toString() {
+    return this.getName();
   }
 
+  /**
+   * @return an unmodifiable list of opinion modifiers contained in this file
+   */
+  public List<OpinionModifier> getOpinionModifiers() {
+    return Collections.unmodifiableList(this.opinionModifiers);
+  }
+
+  public void add(OpinionModifier modifier) {
+    Objects.requireNonNull(modifier);
+    this.opinionModifiers.add(modifier);
+  }
+  
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
+  
+  /** the path to the file */
+  private final Path path;
+  /** the list of opinion modifiers */
+  private final List<OpinionModifier> opinionModifiers;
 
-  private void open(Consumer<ModFile> openHandler) {
-    LOG.entry(openHandler);
-    if (this.getTreeItem() != null && this.getTreeItem().getValue() instanceof ModFile) {
-      openHandler.accept((ModFile) this.getTreeItem().getValue());
-    }
-    LOG.exit();
-  }
 }

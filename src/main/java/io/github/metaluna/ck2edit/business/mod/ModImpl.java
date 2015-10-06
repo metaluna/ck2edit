@@ -155,7 +155,7 @@ class ModImpl implements Mod {
   }
 
   @Override
-  public List<Path> getOpinionModifiers() {
+  public List<ModFile> getOpinionModifiers() {
     if (this.opinionModifiers == null) {
       return Collections.emptyList();
     }
@@ -163,7 +163,7 @@ class ModImpl implements Mod {
   }
 
   @Override
-  public void addOpinionModifier(Path file) {
+  public void addOpinionModifier(ModFile file) {
     if (file == null) {
       return;
     }
@@ -213,6 +213,6 @@ class ModImpl implements Mod {
   /** administrative */
   private Path descriptionFile;
   /** administrative */
-  private List<Path> opinionModifiers;
+  private List<ModFile> opinionModifiers;
 
 }

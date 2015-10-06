@@ -21,36 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package io.github.metaluna.ck2edit.business.mod;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import java.nio.file.Paths;
-import org.junit.Before;
-import org.junit.Test;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+/**
+ * ModFile is the parent interface for all specialized types of scripting files
+ */
+public interface ModFile {
 
-public class ModImplTest {
-
-  private ModImpl mod;
+  String getName();
   
-  @Before
-  public void setUp() {
-    mod = new ModImpl();
-  }
-  
-  @Test
-  public void generatedStringContainsOpinionModifierCount() {
-    mod.addOpinionModifier(new OpinionModifierFile(Paths.get("bla")));
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=1"));
-  }
-
-  @Test
-  public void generatesStringWithoutFiles() {
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=0"));
-  }
-
 }

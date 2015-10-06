@@ -25,15 +25,21 @@ package io.github.metaluna.ck2edit.gui.mod;
 
 import io.github.metaluna.ck2edit.business.mod.ModManager;
 import io.github.metaluna.ck2edit.business.mod.Mod;
+import io.github.metaluna.ck2edit.business.mod.ModFile;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javax.inject.Inject;
@@ -43,10 +49,20 @@ import org.apache.logging.log4j.Logger;
 public class ModPresenter {
 
   public void initialize() {
-
+    this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen));
+    // defined here because tree cells don't receive any key events
+    this.modTreeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+      if (event.getCode() == KeyCode.ENTER) {
+        TreeItem<Object> selected = this.modTreeView.getSelectionModel().getSelectedItem();
+        if (selected.getValue() instanceof ModFile) {
+          ModFile modFile = (ModFile) selected.getValue();
+          onModFileOpen(modFile);
+        }
+      }
+    });
   }
 
-  public void load(File modFile) {
+  public void load(Path modFile) {
     Mod mod;
     LOG.info("Loading mod file '%s'...", modFile.toString());
     mod = modFactory.fromFile(modFile);
@@ -71,20 +87,27 @@ public class ModPresenter {
   private Optional<Mod> currentMod;
   private String baseTitle;
 
+  private void onModFileOpen(ModFile modFile) {
+    LOG.entry(modFile);
+    new Alert(AlertType.INFORMATION, modFile.getName()).show();
+    LOG.exit();
+  }
+
   private void loadTreeFromMod(Mod mod) {
     final TreeItem<Object> root = new TreeItem<>(mod.getName());
 
-    List<Path> opinionModifiers = mod.getOpinionModifiers();
+    List<ModFile> opinionModifiers = mod.getOpinionModifiers();
     if (!opinionModifiers.isEmpty()) {
       TreeItem<Object> opinionModifierRoot = new TreeItem<>("Opinion Modifiers");
+      opinionModifierRoot.setExpanded(true);
       opinionModifierRoot.getChildren().addAll(opinionModifiers.stream()
-              .map(p -> p.getFileName())
-              .map(s -> new TreeItem<Object>(s))
+              .map(m -> new TreeItem<Object>(m))
               .collect(Collectors.toList())
       );
       root.getChildren().add(opinionModifierRoot);
     }
     this.modTreeView.setRoot(root);
+    root.setExpanded(true);
   }
 
   private void setWindowTitle(String name) {

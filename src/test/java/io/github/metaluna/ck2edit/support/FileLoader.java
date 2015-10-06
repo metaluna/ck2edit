@@ -22,35 +22,29 @@
  * THE SOFTWARE.
  */
 
-package io.github.metaluna.ck2edit.business.mod;
+package io.github.metaluna.ck2edit.support;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
+import io.github.metaluna.ck2edit.business.mod.ModReaderTest;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Before;
-import org.junit.Test;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
-public class ModImplTest {
+public class FileLoader {
 
-  private ModImpl mod;
-  
-  @Before
-  public void setUp() {
-    mod = new ModImpl();
-  }
-  
-  @Test
-  public void generatedStringContainsOpinionModifierCount() {
-    mod.addOpinionModifier(new OpinionModifierFile(Paths.get("bla")));
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=1"));
+  public static Path fetchFile(String parent, String file) {
+    URL resourceUrl = ModReaderTest.class.getResource(parent + File.separator + file);
+    Path path = null;
+    try {
+      path = Paths.get(resourceUrl.toURI());
+    } catch (URISyntaxException ex) {
+      fail(String.format("Unable to load file '%s'", resourceUrl.toString()));
+    }
+    return path;
   }
 
-  @Test
-  public void generatesStringWithoutFiles() {
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=0"));
-  }
-
+  // ---vvv--- PRIVATE ---vvv---
+  private FileLoader() {}
 }

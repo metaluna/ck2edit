@@ -23,6 +23,7 @@
  */
 package io.github.metaluna.ck2edit.business.mod;
 
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
 import io.github.metaluna.ck2edit.dataaccess.parser.Node;
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
 import java.io.File;
@@ -44,12 +45,11 @@ import org.apache.logging.log4j.Logger;
 /**
  * Reads mod description files (*.mod)
  */
-class ModReader {
+class ModReader extends ModFileReader {
 
   /**
    * Reads a complete mod from a file on disk.
    *
-   * @param modFile the mod file to read
    * @return the parsed mod
    */
   public Mod read() {
@@ -61,7 +61,7 @@ class ModReader {
   }
 
   // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  ModReader(File modFile, Parser parser) {
+  ModReader(Path modFile, Parser parser) {
     LOG.entry(modFile, parser);
     this.modFile = Objects.requireNonNull(modFile);
     this.parser = Objects.requireNonNull(parser);
@@ -71,38 +71,22 @@ class ModReader {
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
-  private static final Map<String, AttributeSetter<?>> ATTRIBUTE_MAP = new HashMap<>();
+  private static final Map<String, AttributeSetter<Mod, ?>> ATTRIBUTE_MAP = new HashMap<>();
 
-  private final File modFile;
+  private final Path modFile;
   private final Parser parser;
-
-  private enum ValueType {
-
-    SIMPLE, LIST
-  };
-
-  private class AttributeSetter<T> {
-
-    final BiConsumer<Mod, T> setter;
-    final ValueType type;
-
-    AttributeSetter(BiConsumer<Mod, T> setter, ValueType valueType) {
-      this.setter = setter;
-      this.type = valueType;
-    }
-  }
 
   private void initializeAttributeMap() {
     if (!ATTRIBUTE_MAP.isEmpty()) {
       return;
     }
 
-    ATTRIBUTE_MAP.put("name", new AttributeSetter<>(Mod::setName, ValueType.SIMPLE));
-    ATTRIBUTE_MAP.put("path", new AttributeSetter<>(Mod::setPath, ValueType.SIMPLE));
-    ATTRIBUTE_MAP.put("user_dir", new AttributeSetter<>(Mod::setUserDir, ValueType.SIMPLE));
-    ATTRIBUTE_MAP.put("replace_path", new AttributeSetter<>(Mod::addReplacePath, ValueType.SIMPLE));
-    ATTRIBUTE_MAP.put("archive", new AttributeSetter<>(Mod::setArchive, ValueType.SIMPLE));
-    ATTRIBUTE_MAP.put("picture", new AttributeSetter<>(Mod::setPicture, ValueType.SIMPLE));
+    ATTRIBUTE_MAP.put("name", new AttributeSetter<>(Mod::setName, ValueType.STRING));
+    ATTRIBUTE_MAP.put("path", new AttributeSetter<>(Mod::setPath, ValueType.STRING));
+    ATTRIBUTE_MAP.put("user_dir", new AttributeSetter<>(Mod::setUserDir, ValueType.STRING));
+    ATTRIBUTE_MAP.put("replace_path", new AttributeSetter<>(Mod::addReplacePath, ValueType.STRING));
+    ATTRIBUTE_MAP.put("archive", new AttributeSetter<>(Mod::setArchive, ValueType.STRING));
+    ATTRIBUTE_MAP.put("picture", new AttributeSetter<>(Mod::setPicture, ValueType.STRING));
     ATTRIBUTE_MAP.put("tags", new AttributeSetter<>(Mod::setTags, ValueType.LIST));
     ATTRIBUTE_MAP.put("dependencies", new AttributeSetter<>(Mod::setDependencies, ValueType.LIST));
   }
@@ -111,7 +95,7 @@ class ModReader {
   private Mod parseDescription(Node root) {
     LOG.entry();
     final Mod result = new ModImpl();
-    result.setDescriptionFile(this.modFile.toPath());
+    result.setDescriptionFile(this.modFile);
 
     root.getChildren().parallelStream()
             .filter(n -> ATTRIBUTE_MAP.containsKey(n.getName()))
@@ -121,31 +105,6 @@ class ModReader {
               attribute.setter.accept(result, nameValue);
             });
 
-    return LOG.exit(result);
-  }
-
-  private Object fetchAttributeValue(AttributeSetter<?> attribute, Node node) {
-    LOG.entry(attribute, node);
-    final Object result;
-    if (attribute.type == ValueType.SIMPLE) {
-      result = getSimpleValue(node);
-    } else {
-      result = getListValue(node);
-    }
-    return LOG.exit(result);
-  }
-
-  private List<String> getListValue(Node node) {
-    LOG.entry(node);
-    List<String> result = node.getChildren().stream()
-            .map(Node::getName)
-            .collect(Collectors.toList());
-    return LOG.exit(result);
-  }
-
-  private String getSimpleValue(Node node) {
-    LOG.entry(node);
-    String result = node.getChildren().get(0).getName();
     return LOG.exit(result);
   }
 
@@ -161,7 +120,7 @@ class ModReader {
   private void fetchFileList(Mod mod) {
     LOG.entry(mod);
     String modPath = mod.getPath().replace("\"", "");
-    Path path = this.modFile.toPath().getParent().getParent().resolve(modPath);
+    Path path = this.modFile.getParent().getParent().resolve(modPath);
     
     try {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
@@ -171,7 +130,7 @@ class ModReader {
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           if (file.getParent().endsWith(OPINION_MODIFIERS_DIR)) {
             LOG.trace("Adding opinion modifier %s", file.getFileName());
-            mod.addOpinionModifier(file);
+            mod.addOpinionModifier(new OpinionModifierFile(file));
           }
           return FileVisitResult.CONTINUE;
         }

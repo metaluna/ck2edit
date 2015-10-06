@@ -25,10 +25,8 @@ package io.github.metaluna.ck2edit.business.mod;
 
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
 import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
-import java.net.URISyntaxException;
-import java.net.URL;
+import io.github.metaluna.ck2edit.support.FileLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,27 +63,16 @@ public class ModReaderTest {
     modReader = parse("demo.mod");
     Mod mod = modReader.read();
     
-    List<Path> files = mod.getOpinionModifiers();
+    List<ModFile> files = mod.getOpinionModifiers();
     assertThat(files, notNullValue());
-    assertThat(files, hasItems(fetchFile("/demo/common/opinion_modifiers/demo_opinion_modifiers.txt")));
-  }
-
-  public static Path fetchFile(String file) {
-    URL resourceUrl = ModReaderTest.class.getResource("/reader/mod/" + file);
-    Path path = null;
-    try {
-      path = Paths.get(resourceUrl.toURI());
-    } catch (URISyntaxException ex) {
-      fail(String.format("Unable to load file '%s'", resourceUrl.toString()));
-    }
-    return path;
+    assertThat(files.get(0).getName(), is("demo_opinion_modifiers.txt"));
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private ModReader parse(String file) {
-    Path path = fetchFile(file);
+    Path path = FileLoader.fetchFile("/reader/mod", file);
     Parser parser = new ParserFactory().fromFile(path);
-    return new ModReader(path.toFile(), parser);
+    return new ModReader(path, parser);
   }
 
 

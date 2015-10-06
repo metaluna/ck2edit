@@ -40,7 +40,7 @@ public class MainPresenter {
   public void initialize() {
     this.modView = new ModView();
     this.root.setCenter(modView.getView());
-    ((ModPresenter) this.modView.getPresenter()).load(previousMod);
+    ((ModPresenter) this.modView.getPresenter()).load(previousMod.toPath());
   }
 
   // ---vvv--- PRIVATE ---vvv---
@@ -68,7 +68,7 @@ public class MainPresenter {
     
     if (selectedFile != null) {
       this.previousMod = selectedFile;
-      ((ModPresenter) this.modView.getPresenter()).load(selectedFile);
+      ((ModPresenter) this.modView.getPresenter()).load(selectedFile.toPath());
     }
   }
 }

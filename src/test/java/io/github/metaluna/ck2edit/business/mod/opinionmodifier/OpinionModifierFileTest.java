@@ -22,35 +22,46 @@
  * THE SOFTWARE.
  */
 
-package io.github.metaluna.ck2edit.business.mod;
+package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-public class ModImplTest {
+public class OpinionModifierFileTest {
 
-  private ModImpl mod;
+  private OpinionModifierFile opinionModifierFile;
   
   @Before
   public void setUp() {
-    mod = new ModImpl();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void doesNotCreateWithoutPath() {
+    opinionModifierFile = new OpinionModifierFile(null);
   }
   
   @Test
-  public void generatedStringContainsOpinionModifierCount() {
-    mod.addOpinionModifier(new OpinionModifierFile(Paths.get("bla")));
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=1"));
+  public void getsName() throws IOException {
+    Path path = Files.createTempFile(null, null);
+    path.toFile().deleteOnExit();
+    String expName = path.getFileName().toString();
+    opinionModifierFile = new OpinionModifierFile(path);
+    assertThat(opinionModifierFile.getName(), is(expName));
   }
 
   @Test
-  public void generatesStringWithoutFiles() {
-    String gotString = mod.toString();
-    assertThat(gotString, containsString("opinion modifiers=0"));
+  public void toStringContainsFileName() throws IOException {
+    Path path = Files.createTempFile(null, null);
+    path.toFile().deleteOnExit();
+    String expName = path.getFileName().toString();
+    opinionModifierFile = new OpinionModifierFile(path);
+    assertThat(opinionModifierFile.toString(), containsString(expName));
+    
   }
 
 }

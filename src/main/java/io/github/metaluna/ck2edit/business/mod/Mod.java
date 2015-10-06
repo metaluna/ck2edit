@@ -37,7 +37,7 @@ public interface Mod {
   List<String> getTags();
   String getUserDir();
   Path getDescriptionFile();
-  List<Path> getOpinionModifiers();
+  List<ModFile> getOpinionModifiers();
   void setArchive(String archive);
   void setDependencies(List<String> dependencies);
   void setName(String name);
@@ -50,5 +50,5 @@ public interface Mod {
   void addTag(String tag);
   void addDependency(String dependency);
   void setDescriptionFile(Path descriptionFile);
-  void addOpinionModifier(Path file);
+  void addOpinionModifier(ModFile file);
 }
