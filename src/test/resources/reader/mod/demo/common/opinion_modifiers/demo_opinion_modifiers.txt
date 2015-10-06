@@ -1,0 +1,8 @@
+opinion_served_food = {
+  opinion = 10
+  months = 6
+}
+
+opinion_mod_author = {
+  opinion = 100
+}

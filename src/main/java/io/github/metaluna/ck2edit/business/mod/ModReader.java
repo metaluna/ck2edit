@@ -26,6 +26,12 @@ package io.github.metaluna.ck2edit.business.mod;
 import io.github.metaluna.ck2edit.dataaccess.parser.Node;
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +54,9 @@ class ModReader {
    */
   public Mod read() {
     LOG.entry();
-    Objects.requireNonNull(modFile);
     Node root = parser.parse();
-    Mod result = parse(root);
+    Mod result = parseDescription(root);
+    fetchFileList(result);
     return LOG.exit(result);
   }
 
@@ -102,9 +108,10 @@ class ModReader {
   }
 
   @SuppressWarnings("unchecked")
-  private Mod parse(Node root) {
+  private Mod parseDescription(Node root) {
     LOG.entry();
     final Mod result = new ModImpl();
+    result.setDescriptionFile(this.modFile.toPath());
 
     root.getChildren().parallelStream()
             .filter(n -> ATTRIBUTE_MAP.containsKey(n.getName()))
@@ -140,6 +147,40 @@ class ModReader {
     LOG.entry(node);
     String result = node.getChildren().get(0).getName();
     return LOG.exit(result);
+  }
+
+  /**
+   * Adds all files in the mod's directory to the mod object.
+   * <p>
+   * The directory being scanned is determined by taking the parent's parent of
+   * the description file and appending the path specified in the path attribute
+   * of the mod.
+   *
+   * @param mod the mod to add files to
+   */
+  private void fetchFileList(Mod mod) {
+    LOG.entry(mod);
+    String modPath = mod.getPath().replace("\"", "");
+    Path path = this.modFile.toPath().getParent().getParent().resolve(modPath);
+    
+    try {
+      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        private static final String OPINION_MODIFIERS_DIR = "opinion_modifiers";
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          if (file.getParent().endsWith(OPINION_MODIFIERS_DIR)) {
+            LOG.trace("Adding opinion modifier %s", file.getFileName());
+            mod.addOpinionModifier(file);
+          }
+          return FileVisitResult.CONTINUE;
+        }
+        
+      });
+    } catch (IOException ex) {
+      throw new ModReadingException(mod, ex);
+    }
+    LOG.exit();
   }
 
 }

@@ -1,0 +1,11 @@
+demogroupgfx = {
+  skin_tone = 0
+}
+
+demo1gfx = {
+  skin_tone = 1
+}
+
+demo2gfx = {
+  skine_tone = 2
+}

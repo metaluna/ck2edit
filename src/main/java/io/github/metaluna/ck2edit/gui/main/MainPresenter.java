@@ -49,7 +49,7 @@ public class MainPresenter {
   @FXML
   private BorderPane root;
   
-  private File previousMod = new File("/home/monsi/Projekte/mods/crusaderkings2/better gender law mod/descriptor.mod");
+  private File previousMod = new File("/home/monsi/Projekte/mods/crusaderkings2/mod/better gender law mod.mod");
   private ModView modView;
 
   @FXML

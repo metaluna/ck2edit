@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -23,32 +23,14 @@
  */
 package io.github.metaluna.ck2edit.business.mod;
 
-import java.nio.file.Path;
-import java.util.List;
+public class ModReadingException extends RuntimeException {
 
-public interface Mod {
+  public ModReadingException(Mod mod) {
+    super(String.format("Error while reading mod '%s' (%s)", mod.getName(), mod.getDescriptionFile()));
+  }
 
-  String getArchive();
-  List<String> getDependencies();
-  String getName();
-  String getPath();
-  String getPicture();
-  List<String> getReplacePaths();
-  List<String> getTags();
-  String getUserDir();
-  Path getDescriptionFile();
-  List<Path> getOpinionModifiers();
-  void setArchive(String archive);
-  void setDependencies(List<String> dependencies);
-  void setName(String name);
-  void setPath(String path);
-  void setPicture(String picture);
-  void setReplacePaths(List<String> replacePaths);
-  void setTags(List<String> tags);
-  void setUserDir(String userDir);
-  void addReplacePath(String replacePath);
-  void addTag(String tag);
-  void addDependency(String dependency);
-  void setDescriptionFile(Path descriptionFile);
-  void addOpinionModifier(Path file);
+  public ModReadingException(Mod mod, Throwable t) {
+    super(String.format("Error while reading mod '%s' (%s)", mod.getName(), mod.getDescriptionFile()), t);
+  }
+  
 }

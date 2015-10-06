@@ -24,7 +24,9 @@
 package io.github.metaluna.ck2edit.business.mod;
 
 import com.google.common.base.MoreObjects;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class ModImpl implements Mod {
@@ -143,8 +145,37 @@ class ModImpl implements Mod {
   }
 
   @Override
+  public Path getDescriptionFile() {
+    return this.descriptionFile;
+  }
+  
+  @Override
+  public void setDescriptionFile(Path descriptionFile) {
+    this.descriptionFile = descriptionFile;
+  }
+
+  @Override
+  public List<Path> getOpinionModifiers() {
+    if (this.opinionModifiers == null) {
+      return Collections.emptyList();
+    }
+    return this.opinionModifiers;
+  }
+
+  @Override
+  public void addOpinionModifier(Path file) {
+    if (file == null) {
+      return;
+    }
+    if (this.opinionModifiers == null) {
+      this.opinionModifiers = new ArrayList<>();
+    }
+    this.opinionModifiers.add(file);
+  }
+
+  @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
+    MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this)
             .omitNullValues()
             .add("name", name)
             .add("path", path)
@@ -154,7 +185,12 @@ class ModImpl implements Mod {
             .add("dependencies", dependencies)
             .add("picture", picture)
             .add("tags", tags)
-            .toString();
+            .add("description file", descriptionFile);
+    
+    int fileCount = opinionModifiers != null ? opinionModifiers.size() : 0;
+    helper.add("opinion modifiers", fileCount);
+    
+    return helper.toString();
   }
   
   // ---vvv--- PRIVATE ---vvv---
@@ -174,5 +210,9 @@ class ModImpl implements Mod {
   private String picture;
   /** optional, list */
   private List<String> tags;
+  /** administrative */
+  private Path descriptionFile;
+  /** administrative */
+  private List<Path> opinionModifiers;
 
 }

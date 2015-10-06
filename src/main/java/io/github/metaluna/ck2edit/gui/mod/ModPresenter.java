@@ -26,7 +26,10 @@ package io.github.metaluna.ck2edit.gui.mod;
 import io.github.metaluna.ck2edit.business.mod.ModManager;
 import io.github.metaluna.ck2edit.business.mod.Mod;
 import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
@@ -69,7 +72,19 @@ public class ModPresenter {
   private String baseTitle;
 
   private void loadTreeFromMod(Mod mod) {
-    this.modTreeView.setRoot(new TreeItem<>(mod.getName()));
+    final TreeItem<Object> root = new TreeItem<>(mod.getName());
+
+    List<Path> opinionModifiers = mod.getOpinionModifiers();
+    if (!opinionModifiers.isEmpty()) {
+      TreeItem<Object> opinionModifierRoot = new TreeItem<>("Opinion Modifiers");
+      opinionModifierRoot.getChildren().addAll(opinionModifiers.stream()
+              .map(p -> p.getFileName())
+              .map(s -> new TreeItem<Object>(s))
+              .collect(Collectors.toList())
+      );
+      root.getChildren().add(opinionModifierRoot);
+    }
+    this.modTreeView.setRoot(root);
   }
 
   private void setWindowTitle(String name) {
@@ -80,13 +95,13 @@ public class ModPresenter {
       LOG.catching(e);
       return;
     }
-    
+
     if (baseTitle == null) {
       baseTitle = stage.getTitle();
     }
     stage.setTitle(name + " | " + baseTitle);
   }
-  
+
   private Optional<Stage> getStage() {
     return Optional.ofNullable((Stage) centerSplitPane.getScene().getWindow());
   }

@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
@@ -43,7 +44,7 @@ public class ModReaderTest {
   }
 
   @Test
-  public void readsCompleteFile() {
+  public void readsDescriptionFile() {
     modReader = parse("complete.mod");
     Mod mod = modReader.read();
     assertThat(mod.getName(), is("\"Complete Mod\""));
@@ -57,6 +58,16 @@ public class ModReaderTest {
     assertThat(mod.getTags(), hasItem("\"Tag 2\""));
     assertThat(mod.getDependencies(), hasItem("\"Parent Mod 1\""));
     assertThat(mod.getDependencies(), hasItem("\"Parent Mod 2\""));
+  }
+  
+  @Test
+  public void readsOpinionModifiers() {
+    modReader = parse("demo.mod");
+    Mod mod = modReader.read();
+    
+    List<Path> files = mod.getOpinionModifiers();
+    assertThat(files, notNullValue());
+    assertThat(files, hasItems(fetchFile("/demo/common/opinion_modifiers/demo_opinion_modifiers.txt")));
   }
 
   public static Path fetchFile(String file) {

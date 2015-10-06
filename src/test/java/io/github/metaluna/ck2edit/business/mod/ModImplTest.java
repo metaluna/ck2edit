@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -21,34 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package io.github.metaluna.ck2edit.business.mod;
 
-import java.nio.file.Path;
-import java.util.List;
+import java.nio.file.Paths;
+import org.junit.Before;
+import org.junit.Test;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
-public interface Mod {
+public class ModImplTest {
 
-  String getArchive();
-  List<String> getDependencies();
-  String getName();
-  String getPath();
-  String getPicture();
-  List<String> getReplacePaths();
-  List<String> getTags();
-  String getUserDir();
-  Path getDescriptionFile();
-  List<Path> getOpinionModifiers();
-  void setArchive(String archive);
-  void setDependencies(List<String> dependencies);
-  void setName(String name);
-  void setPath(String path);
-  void setPicture(String picture);
-  void setReplacePaths(List<String> replacePaths);
-  void setTags(List<String> tags);
-  void setUserDir(String userDir);
-  void addReplacePath(String replacePath);
-  void addTag(String tag);
-  void addDependency(String dependency);
-  void setDescriptionFile(Path descriptionFile);
-  void addOpinionModifier(Path file);
+  private ModImpl mod;
+  
+  @Before
+  public void setUp() {
+    mod = new ModImpl();
+  }
+  
+  @Test
+  public void generatedStringContainsOpinionModifierCount() {
+    mod.addOpinionModifier(Paths.get("bla"));
+    String gotString = mod.toString();
+    assertThat(gotString, containsString("opinion modifiers=1"));
+  }
+
+  @Test
+  public void generatesStringWithoutFiles() {
+    String gotString = mod.toString();
+    assertThat(gotString, containsString("opinion modifiers=0"));
+  }
+
 }
