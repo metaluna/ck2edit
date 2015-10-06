@@ -1,0 +1,71 @@
+Add as issues (reader, writer, gui):
+====================================
+mod description
+opinion modifiers
+localization
+traits
+static modifiers
+event modifiers
+triggered modifiers
+religious modifiers
+bookmarks
+
+events
+buildings
+casus belli
+combat tactics
+cultures
+defines
+diseases
+dynasties
+governments
+graphical culture types
+job actions
+job titles
+landed titles
+councillor laws
+crown laws
+demesne laws
+succession laws
+mercenaries
+minor titles
+modifier definitions
+nicknames
+objectives
+on actions
+religions
+religious titles
+retinue subunits
+scripted effects
+scripted triggers
+special troops
+stories
+trade routes
+region colors
+technology
+decisions
+music
+tutorial
+
+history stuff:
+--------------
+character history
+diplomacy history
+province history
+technology history
+title history
+war history
+
+map stuff:
+----------
+default map
+province definition
+positions
+adjacencies
+climate
+continents
+geographical regions
+island regions
+seasons
+terrain
+static (?)
