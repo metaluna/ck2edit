@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
+
+import java.util.Optional;
 
 /**
  * Represents a single opinion modifier
@@ -31,12 +32,13 @@ public class OpinionModifier {
 
   public OpinionModifier(String name) {
     this.name = name;
+    this.duration = Optional.empty();
   }
 
   public String getName() {
     return this.name;
   }
-  
+
   public int getOpinion() {
     return opinion;
   }
@@ -45,12 +47,20 @@ public class OpinionModifier {
     this.opinion = opinion;
   }
 
-  public int getDuration() {
+  /**
+   * @return the duration in months
+   */
+  public Optional<Integer> getDuration() {
     return duration;
   }
 
-  public void setDuration(int duration) {
-    this.duration = duration;
+  /**
+   * Duration this modifier will be applied in months. May be <code>null</code>.
+   *
+   * @param duration the duration in months
+   */
+  public void setDuration(Integer duration) {
+    this.duration = Optional.ofNullable(duration);
   }
 
   public boolean isPrisonReason() {
@@ -118,12 +128,15 @@ public class OpinionModifier {
   }
 
   // ---vvv--- PRIVATE ---vvv---
-  /** required */
+  /**
+   * required
+   */
   private final String name;
-  /** required */
+  /**
+   * required
+   */
   private int opinion;
-  /** required */
-  private int duration;
+  private Optional<Integer> duration;
   private boolean prisonReason;
   private boolean banishReason;
   private boolean executeReason;

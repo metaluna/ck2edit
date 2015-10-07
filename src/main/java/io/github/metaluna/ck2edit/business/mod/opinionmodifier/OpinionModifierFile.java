@@ -46,6 +46,11 @@ public class OpinionModifierFile implements ModFile {
     this.path = Objects.requireNonNull(path);
     this.opinionModifiers = new ArrayList<>();
   }
+  
+  @Override
+  public Path getPath() {
+    return this.path;
+  }
 
   @Override
   public String getName() {

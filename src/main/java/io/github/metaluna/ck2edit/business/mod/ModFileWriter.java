@@ -21,16 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package io.github.metaluna.ck2edit.business.mod;
 
-import java.nio.file.Path;
+import io.github.metaluna.ck2edit.dataaccess.parser.Node;
 
 /**
- * ModFile is the parent interface for all specialized types of scripting files
+ * Writer base class
  */
-public interface ModFile {
+abstract class ModFileWriter {
 
-  Path getPath();
-  String getName();
-  
+  abstract Node print();
 }

@@ -72,7 +72,7 @@ public class OpinionModifierReaderTest {
     OpinionModifier modifier2 = modifiers.get(1);
     assertThat(modifier2.getName(), is("opinion_all_features"));
     assertThat(modifier2.getOpinion(), is(-10));
-    assertThat(modifier2.getDuration(), is(12));
+    assertThat(modifier2.getDuration().get(), is(12));
     assertThat(modifier2.isBanishReason(), is(true));
     assertThat(modifier2.isCrime(), is(true));
     assertThat(modifier2.isDivorceReason(), is(true));
