@@ -87,9 +87,7 @@ class ModWriter {
 
     if (mod.getReplacePaths() != null) {
       mod.getReplacePaths().stream()
-              .map(p -> Node.create(p))
-              .map(n -> Node.create("replace_path").addChild(n))
-              .forEach(n -> result.addChild(n));
+              .forEach(p -> addSimpleValue(result, "replace_path", p));
     }
     addSimpleValue(result, "picture", mod.getPicture());
     addList(result, "tags", mod.getTags());
@@ -103,8 +101,7 @@ class ModWriter {
     if (value == null) {
       return;
     }
-    final Node n = Node.create(name).addChild(value);
-    result.addChild(n);
+    result.addPair(name, value);
     LOG.exit();
   }
 
@@ -113,9 +110,7 @@ class ModWriter {
     if (values == null || values.isEmpty()) {
       return;
     }
-    final Node n = Node.create(name);
-    values.stream().forEach(v -> n.addChild(v));
-    result.addChild(n);
+    result.addList(name, values);
     LOG.exit();
   }
 

@@ -98,7 +98,7 @@ public class Node {
    * the same format as the input format.
    *
    * @param indentations the number of indentations prefixing all output
-   * @return the
+   * @return the finished output
    */
   public String print(int indentations) {
     LOG.entry(indentations);
@@ -155,6 +155,42 @@ public class Node {
   public Node addChild(String name) {
     LOG.entry(name);
     this.addChild(new Node(name));
+    return LOG.exit(this);
+  }
+
+  /**
+   * Adds a node with a single child node.
+   * @param name the name of the direct child
+   * @param value the name of the child's child
+   * @return a reference to this node
+   */
+  public Node addPair(String name, String value) {
+    LOG.entry(name, value);
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(value);
+    final Node n = Node.create(name).addChild(value);
+    this.addChild(n);
+    return LOG.exit(this);
+  }
+
+  /**
+   * Adds a node with a list of leaves as children. If the list of values
+   * is empty nothing will be added.
+   * @param name the name of the direct child
+   * @param values the names of the leaves.
+   * @return a reference to this node
+   */
+  public Node addList(String name, List<String> values) {
+    LOG.entry(name, values);
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(values);
+    if (values.isEmpty()) {
+      LOG.warn("Tried to add empty list of values with property name '%s' to node: ", name, this);
+    } else {
+      final Node n = Node.create(name);
+      values.stream().forEach(v -> n.addChild(v));
+      this.addChild(n);
+    }
     return LOG.exit(this);
   }
   

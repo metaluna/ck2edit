@@ -23,6 +23,9 @@
  */
 package io.github.metaluna.ck2edit.dataaccess.parser;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
@@ -87,11 +90,30 @@ public class NodeTest {
     assertThat(node.getChildren(), contains(child));
   }
   
+  @Test
+  public void addChildReturnsParentNode() {
+    Node child = new Node("childnode");
+    Node gotNode = node.addChild(child);
+    assertThat(gotNode, is(this.node));
+  }
+  
   @Test(expected = NullPointerException.class)
   public void doesNotAddNullChild() {
     node.addChild((Node) null);
   }
 
+  @Test
+  public void addsAndGetsStringNodeChild() {
+    String expName = "childnode";
+    node.addChild(expName);
+    assertThat(node.getChildren().get(0).getName(), is(expName));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddNullStringChild() {
+    node.addChild((String) null);
+  }
+  
   @Test
   public void emptyNodeIsLeaf() {
     assertTrue(node.isLeaf());
@@ -101,6 +123,59 @@ public class NodeTest {
   public void nodeWithChildrenIsNotLeaf() {
     node.addChild(new Node("blubb"));
     assertFalse(node.isLeaf());
+  }
+  
+  @Test
+  public void addsStringValue() {
+    String expName = "property", expValue = "value";
+    
+    node.addPair(expName, expValue);
+    
+    assertThat(node.getChildren(), hasSize(1));
+    Node pair = node.getChildren().get(0);
+    assertThat(pair.getName(), is(expName));
+    assertThat(pair.getChildren().get(0).getName(), is(expValue));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddPairWithoutName() {
+    node.addPair(null, "value");
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddPairWithoutValue() {
+    node.addPair("property", null);
+  }
+
+  @Test
+  public void addsListValue() {
+    String expName = "property", li1 = "a", li2 = "b";
+    List<String> expValues = Arrays.asList(li1, li2);
+    
+    node.addList(expName, expValues);
+    
+    assertThat(node.getChildren(), hasSize(1));
+    Node pair = node.getChildren().get(0);
+    assertThat(pair.getName(), is(expName));
+    assertThat(pair.getChildren(), hasSize(2));
+    assertThat(pair.getChildren().get(0).getName(), is(li1));
+    assertThat(pair.getChildren().get(1).getName(), is(li2));
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddListWithoutName() {
+    node.addList(null, Arrays.asList("a"));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddListWithoutValues() {
+    node.addList("property", null);
+  }
+  
+  @Test
+  public void doesNotAddListWithEmptyValuesList() {
+    node.addList("property", Collections.emptyList());
+    assertThat(node.getChildren(), is(empty()));
   }
   
 }
