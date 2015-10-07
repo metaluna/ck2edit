@@ -24,12 +24,8 @@
 package io.github.metaluna.ck2edit.business.mod;
 
 import io.github.metaluna.ck2edit.dataaccess.parser.Node;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
+import io.github.metaluna.ck2edit.util.Validator;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,46 +34,12 @@ import org.apache.logging.log4j.Logger;
  * Persists a mod file. This does only write the mod description file to disk
  * (*.mod), not any actual modded files.
  */
-class ModWriter {
+class ModWriter extends ModFileWriter {
 
-  /**
-   * Writes the file.
-   */
-  public void write() {
+  // ---vvv--- PROTECTED ---vvv---
+  @Override
+  protected Node print() {
     LOG.entry();
-    this.validate();
-    Node root = print(this.mod);
-    try (BufferedWriter writer = Files.newBufferedWriter(this.file, CHARSET)) {
-      writer.write(root.toString());
-    } catch (IOException ex) {
-      LOG.catching(ex);
-    }
-    LOG.exit();
-  }
-
-  // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  /**
-   * Constructor
-   *
-   * @param file the path to the file including the name
-   * @param mod the mod to persist
-   */
-  ModWriter(Path file, Mod mod) {
-    LOG.entry(file, mod);
-    this.file = Objects.requireNonNull(file);
-    this.mod = Objects.requireNonNull(mod);
-    LOG.exit();
-  }
-
-  // ---vvv--- PRIVATE ---vvv---
-  private static final Logger LOG = LogManager.getFormatterLogger();
-  private static final Charset CHARSET = Charset.forName("Windows-1252");
-
-  private final Path file;
-  private final Mod mod;
-
-  private Node print(Mod mod) {
-    LOG.entry(mod);
     final Node result = Node.createRoot();
 
     addSimpleValue(result, "name", mod.getName());
@@ -96,34 +58,33 @@ class ModWriter {
     return LOG.exit(result);
   }
 
-  private void addSimpleValue(Node result, String name, String value) {
-    LOG.entry(result, name, value);
-    if (value == null) {
-      return;
-    }
-    result.addPair(name, value);
-    LOG.exit();
-  }
-
-  private void addList(Node result, String name, List<String> values) {
-    LOG.entry(result, name, values);
-    if (values == null || values.isEmpty()) {
-      return;
-    }
-    result.addList(name, values);
-    LOG.exit();
-  }
-
-  private void validate() {
-    if (!validString(this.mod.getName())) {
+  @Override
+  protected void validate() {
+    if (!Validator.validString(this.mod.getName())) {
       throw new IllegalStateException("Cannot save mod. Name is required.");
     }
-    if (!validString(this.mod.getPath())) {
+    if (!Validator.validString(this.mod.getPath())) {
       throw new IllegalStateException(String.format("Cannot save mod %s. Path is required.", this.mod.getName()));
     }
   }
-
-  private boolean validString(String test) {
-    return test != null && !test.isEmpty();
+  
+  // ---vvv--- PACKAGE-PRIVATE ---vvv---
+  /**
+   * Constructor
+   *
+   * @param file the path to the file including the name
+   * @param mod the mod to persist
+   */
+  ModWriter(Path file, Mod mod) {
+    super(file);
+    LOG.entry(file, mod);
+    this.mod = Objects.requireNonNull(mod);
+    LOG.exit();
   }
+
+  // ---vvv--- PRIVATE ---vvv---
+  private static final Logger LOG = LogManager.getFormatterLogger();
+
+  private final Mod mod;
+
 }

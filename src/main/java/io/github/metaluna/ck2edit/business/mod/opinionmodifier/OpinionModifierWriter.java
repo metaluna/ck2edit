@@ -23,47 +23,20 @@
  */
 package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
+import io.github.metaluna.ck2edit.business.mod.ModFileWriter;
 import io.github.metaluna.ck2edit.dataaccess.parser.Node;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.Objects;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Persists an {@link OpinionModifierFile} to disk.
  */
-class OpinionModifierWriter  {
+class OpinionModifierWriter extends ModFileWriter {
 
-  public void write() {
-    LOG.entry();
-    this.validate();
-    Node root = print();
-    try (BufferedWriter writer = Files.newBufferedWriter(this.opinionModifierFile.getPath(), CHARSET)) {
-      writer.write(root.toString());
-    } catch (IOException ex) {
-      LOG.catching(ex);
-    }
-    LOG.exit();
-  }
-
-  // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  OpinionModifierWriter(OpinionModifierFile file) {
-    LOG.entry(file);
-    this.opinionModifierFile = Objects.requireNonNull(file);
-    LOG.exit();
-  }
-
-  // ---vvv--- PRIVATE ---vvv---
-  private static final Logger LOG = LogManager.getFormatterLogger();
-  private static final Charset CHARSET = Charset.forName("Windows-1252");
-
-  private final OpinionModifierFile opinionModifierFile;
-
-  private Node print() {
+  // ---vvv--- PROTECTED ---vvv---
+  @Override
+  protected Node print() {
     LOG.entry();
     final Node result = Node.createRoot();
 
@@ -84,40 +57,9 @@ class OpinionModifierWriter  {
     
     return LOG.exit(result);
   }
-  
-  private void addSimpleValue(Node result, String name, boolean value) {
-    LOG.entry(result, name, value);
-    if (value) {
-      addSimpleValue(result, name, "yes");
-    } else {
-      LOG.trace("Skipping negative boolean for %s", name);
-    }
-    LOG.exit();
-  }
-  
-  private void addSimpleValue(Node result, String name, int value) {
-    LOG.entry(result, name, value);
-    String stringValue = Integer.toString(value);
-    addSimpleValue(result, name, stringValue);
-    LOG.exit();
-  }
-  
-  private void addSimpleValue(Node result, String name, Optional<Integer> value) {
-    LOG.entry(result, name, value);
-    value.ifPresent(v -> addSimpleValue(result, name, v));
-    LOG.exit();
-  }
 
-  private void addSimpleValue(Node result, String name, String value) {
-    LOG.entry(result, name, value);
-    if (value == null) {
-      return;
-    }
-    result.addPair(name, value);
-    LOG.exit();
-  }
-
-  private void validate() {
+  @Override
+  protected void validate() {
     if (opinionModifierFile.getOpinionModifiers().isEmpty()) {
       throw new IllegalStateException(
               String.format(
@@ -125,5 +67,19 @@ class OpinionModifierWriter  {
                       opinionModifierFile.getName()));
     }
   }
+  
+  // ---vvv--- PACKAGE-PRIVATE ---vvv---
+  OpinionModifierWriter(OpinionModifierFile file) {
+    super(file.getPath());
+    LOG.entry(file);
+    this.opinionModifierFile = Objects.requireNonNull(file);
+    LOG.exit();
+  }
+  
+  // ---vvv--- PRIVATE ---vvv---
+  private static final Logger LOG = LogManager.getFormatterLogger();
+
+  private final OpinionModifierFile opinionModifierFile;
+
   
 }
