@@ -26,21 +26,20 @@ package io.github.metaluna.ck2edit.gui.mod;
 import io.github.metaluna.ck2edit.business.mod.ModManager;
 import io.github.metaluna.ck2edit.business.mod.Mod;
 import io.github.metaluna.ck2edit.business.mod.ModFile;
-import java.io.File;
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
+import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersPresenter;
+import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersView;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
@@ -82,14 +81,17 @@ public class ModPresenter {
   @FXML
   private TreeView<Object> modTreeView;
   @FXML
-  private AnchorPane modOpenFilesPane;
+  private BorderPane modOpenFilesPane;
 
   private Optional<Mod> currentMod;
   private String baseTitle;
 
   private void onModFileOpen(ModFile modFile) {
     LOG.entry(modFile);
-    new Alert(AlertType.INFORMATION, modFile.getName()).show();
+    OpinionModifiersView view = new OpinionModifiersView();
+    OpinionModifiersPresenter presenter = (OpinionModifiersPresenter) view.getPresenter();
+    presenter.load((OpinionModifierFile) modFile);
+    this.modOpenFilesPane.setCenter(view.getView());
     LOG.exit();
   }
 

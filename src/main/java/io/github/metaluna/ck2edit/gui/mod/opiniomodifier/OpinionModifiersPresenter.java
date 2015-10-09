@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -21,21 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.business.mod;
+package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
-import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
-import java.nio.file.Path;
-import javax.inject.Inject;
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
+import javafx.fxml.FXML;
+import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class ModManager {
+public class OpinionModifiersPresenter {
 
-  public Mod fromFile(Path modFile) {
-    return new ModReader(modFile, parserFactory.fromFile(modFile), new OpinionModifierManager(parserFactory)).read();
+  public void load(OpinionModifierFile file) {
+    LOG.entry(file);
+    for (OpinionModifier om : file.getOpinionModifiers()) {
+      OpinionModifierView omView = new OpinionModifierView();
+      OpinionModifierPresenter omPresenter = (OpinionModifierPresenter) omView.getPresenter();
+      omPresenter.setOpinionModifier(om);
+      root.getChildren().add(omView.getView());
+    }
+    LOG.exit();
   }
+
+  // ---vvv--- PRIVATE ---vvv---
+  private static final Logger LOG = LogManager.getFormatterLogger();
   
-  // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  @Inject
-  ParserFactory parserFactory;
-  
+  @FXML
+  private VBox root;
+
 }

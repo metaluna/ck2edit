@@ -6,10 +6,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <SplitPane fx:id="centerSplitPane" dividerPositions="0.3" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.metaluna.ck2edit.gui.mod.ModPresenter">
 <items>
       <TreeView fx:id="modTreeView" prefWidth="600.0" SplitPane.resizableWithParent="false" />
-      <AnchorPane fx:id="modOpenFilesPane" />
+      <BorderPane fx:id="modOpenFilesPane" />
 </items>
 </SplitPane>

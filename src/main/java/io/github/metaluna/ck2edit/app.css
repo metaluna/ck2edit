@@ -14,3 +14,9 @@
 .text-area .content {
   -fx-background-color: main-bg;
 }
+
+.opinion-modifier-item {
+  -fx-border-color: #009999;
+  -fx-border-width: 1px;
+  -fx-border-radius: 5px;
+}

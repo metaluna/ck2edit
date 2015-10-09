@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -21,21 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.business.mod;
+package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
 import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
 import java.nio.file.Path;
-import javax.inject.Inject;
+import java.util.Objects;
 
-public class ModManager {
-
-  public Mod fromFile(Path modFile) {
-    return new ModReader(modFile, parserFactory.fromFile(modFile), new OpinionModifierManager(parserFactory)).read();
+public class OpinionModifierManager {
+  
+  public OpinionModifierManager(ParserFactory parserFactory) {
+    this.parserFactory = Objects.requireNonNull(parserFactory);
   }
   
-  // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  @Inject
-  ParserFactory parserFactory;
-  
+  public OpinionModifierFile fromFile(Path path) {
+    return new OpinionModifierReader(path, parserFactory.fromFile(path)).read();
+  }
+
+  // ---vvv--- PRIVATE ---vvv---
+  private final ParserFactory parserFactory;
 }

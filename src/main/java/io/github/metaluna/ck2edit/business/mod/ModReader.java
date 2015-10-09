@@ -24,9 +24,9 @@
 package io.github.metaluna.ck2edit.business.mod;
 
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
 import io.github.metaluna.ck2edit.dataaccess.parser.Node;
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -34,11 +34,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,10 +59,11 @@ class ModReader extends ModFileReader {
   }
 
   // ---vvv--- PACKAGE-PRIVATE ---vvv---
-  ModReader(Path modFile, Parser parser) {
+  ModReader(Path modFile, Parser parser, OpinionModifierManager opinionModifierManager) {
     LOG.entry(modFile, parser);
     this.modFile = Objects.requireNonNull(modFile);
     this.parser = Objects.requireNonNull(parser);
+    this.opinionModifierManager = Objects.requireNonNull(opinionModifierManager);
     this.initializeAttributeMap();
     LOG.exit();
   }
@@ -75,7 +74,8 @@ class ModReader extends ModFileReader {
 
   private final Path modFile;
   private final Parser parser;
-
+  private final OpinionModifierManager opinionModifierManager;
+  
   private void initializeAttributeMap() {
     if (!ATTRIBUTE_MAP.isEmpty()) {
       return;
@@ -130,7 +130,7 @@ class ModReader extends ModFileReader {
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           if (file.getParent().endsWith(OPINION_MODIFIERS_DIR)) {
             LOG.trace("Adding opinion modifier %s", file.getFileName());
-            mod.addOpinionModifier(new OpinionModifierFile(file));
+            mod.addOpinionModifier(opinionModifierManager.fromFile(file));
           }
           return FileVisitResult.CONTINUE;
         }

@@ -23,15 +23,19 @@
  */
 package io.github.metaluna.ck2edit.business.mod;
 
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
 import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
 import io.github.metaluna.ck2edit.support.FileLoader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class ModReaderTest {
 
@@ -72,7 +76,10 @@ public class ModReaderTest {
   private ModReader parse(String file) {
     Path path = FileLoader.fetchFile("/reader/mod", file);
     Parser parser = new ParserFactory().fromFile(path);
-    return new ModReader(path, parser);
+    OpinionModifierManager omManager = mock(OpinionModifierManager.class);
+    OpinionModifierFile omFile = new OpinionModifierFile(Paths.get("demo_opinion_modifiers.txt"));
+    when(omManager.fromFile(any())).thenReturn(omFile);    
+    return new ModReader(path, parser, omManager);
   }
 
 
