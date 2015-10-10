@@ -70,6 +70,20 @@ public class ModPresenter {
     loadTreeFromMod(mod);
   }
 
+  public void saveFile() {
+    LOG.entry();
+    if (this.currentFile instanceof OpinionModifierFile) {
+      modFactory.saveFile((OpinionModifierFile) this.currentFile);
+    }
+    LOG.exit();
+  }
+
+  public void saveAllFiles() {
+    LOG.entry();
+    throw new UnsupportedOperationException("Not supported yet.");
+//    LOG.exit();
+  }
+
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
 
@@ -84,10 +98,12 @@ public class ModPresenter {
   private BorderPane modOpenFilesPane;
 
   private Optional<Mod> currentMod;
+  private ModFile currentFile;
   private String baseTitle;
 
   private void onModFileOpen(ModFile modFile) {
     LOG.entry(modFile);
+    this.currentFile = modFile;
     OpinionModifiersView view = new OpinionModifiersView();
     OpinionModifiersPresenter presenter = (OpinionModifiersPresenter) view.getPresenter();
     presenter.load((OpinionModifierFile) modFile);

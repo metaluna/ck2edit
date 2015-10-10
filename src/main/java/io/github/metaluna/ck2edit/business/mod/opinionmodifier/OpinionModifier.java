@@ -23,6 +23,7 @@
  */
 package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -31,12 +32,23 @@ import java.util.Optional;
 public class OpinionModifier {
 
   public OpinionModifier(String name) {
-    this.name = name;
+    this.name = Objects.requireNonNull(name);
     this.duration = Optional.empty();
   }
 
+  /**
+   * @return the file name. Never <code>null</code>
+   */
   public String getName() {
     return this.name;
+  }
+
+  /**
+   * @param name the file name. Must not be <code>null</code>.
+   * @throws NullPointerException if set to <code>null</code>
+   */
+  public void setName(String name) {
+    this.name = Objects.requireNonNull(name);
   }
 
   public int getOpinion() {
@@ -131,7 +143,7 @@ public class OpinionModifier {
   /**
    * required
    */
-  private final String name;
+  private String name;
   /**
    * required
    */

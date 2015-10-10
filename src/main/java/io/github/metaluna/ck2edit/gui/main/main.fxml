@@ -13,8 +13,23 @@
         <menus>
           <Menu text="_File">
             <items>
-                  <MenuItem onAction="#onOpenFile" text="_Open Mod..." />
-              <MenuItem disable="true" text="_Quit" />
+                  <MenuItem onAction="#onOpenFile" text="_Open Mod...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+                  <SeparatorMenuItem/>
+                  <MenuItem onAction="#onSaveFile" text="_Save">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem onAction="#onSaveAllFiles"  text="Save _All">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem/>
+              <MenuItem text="_Quit" />
             </items>
           </Menu>
           <Menu text="_Edit">

@@ -37,6 +37,10 @@ public class OpinionModifierManager {
     return new OpinionModifierReader(path, parserFactory.fromFile(path)).read();
   }
 
+  public void saveFile(OpinionModifierFile omFile) {
+    new OpinionModifierWriter(omFile).write();
+  }
+
   // ---vvv--- PRIVATE ---vvv---
   private final ParserFactory parserFactory;
 }

@@ -38,9 +38,12 @@ import org.apache.logging.log4j.Logger;
 public class MainPresenter {
   
   public void initialize() {
+    LOG.entry();
     this.modView = new ModView();
     this.root.setCenter(modView.getView());
-    ((ModPresenter) this.modView.getPresenter()).load(previousMod.toPath());
+    this.modPresenter = (ModPresenter) this.modView.getPresenter();
+    this.modPresenter.load(previousMod.toPath());
+    LOG.exit();
   }
 
   // ---vvv--- PRIVATE ---vvv---
@@ -51,9 +54,11 @@ public class MainPresenter {
   
   private File previousMod = new File("/home/monsi/Projekte/mods/crusaderkings2/mod/better gender law mod.mod");
   private ModView modView;
+  private ModPresenter modPresenter;
 
   @FXML
   private void onOpenFile(ActionEvent event) {
+    LOG.entry(event);
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open File");
     fileChooser.getExtensionFilters().addAll(
@@ -70,5 +75,20 @@ public class MainPresenter {
       this.previousMod = selectedFile;
       ((ModPresenter) this.modView.getPresenter()).load(selectedFile.toPath());
     }
+    LOG.exit();
+  }
+  
+  @FXML
+  private void onSaveFile(ActionEvent event) {
+    LOG.entry(event);
+    this.modPresenter.saveFile();
+    LOG.exit();
+  }
+  
+  @FXML
+  private void onSaveAllFiles(ActionEvent event) {
+    LOG.entry(event);
+    this.modPresenter.saveAllFiles();
+    LOG.exit();
   }
 }

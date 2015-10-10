@@ -23,10 +23,13 @@
  */
 package io.github.metaluna.ck2edit.business.mod;
 
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
 import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
 import java.nio.file.Path;
 import javax.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ModManager {
 
@@ -34,7 +37,15 @@ public class ModManager {
     return new ModReader(modFile, parserFactory.fromFile(modFile), new OpinionModifierManager(parserFactory)).read();
   }
   
+  public void saveFile(OpinionModifierFile omFile) {
+    LOG.entry(omFile);
+    new OpinionModifierManager(parserFactory).saveFile(omFile);
+    LOG.exit();
+  }
+  
   // ---vvv--- PACKAGE-PRIVATE ---vvv---
+  private static final Logger LOG = LogManager.getFormatterLogger();
+  
   @Inject
   ParserFactory parserFactory;
   

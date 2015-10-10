@@ -24,6 +24,9 @@
 package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
 
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;
@@ -43,6 +46,7 @@ public class OpinionModifierPresenter {
     LOG.entry(opinionModifier);
     this.opinionModifier = opinionModifier;
     refresh();
+    bindAttributes();
     LOG.exit();
   }
 
@@ -85,6 +89,28 @@ public class OpinionModifierPresenter {
     this.inheritCheckBox.setSelected(this.opinionModifier.isInherited());
     this.crimeCheckBox.setSelected(this.opinionModifier.isCrime());
     this.enemyCheckBox.setSelected(this.opinionModifier.isEnemy());
+  }
+
+  private void bindAttributes() {
+    LOG.entry();
+    this.nameTextField.textProperty().addListener((ObservableValue<? extends String> o, String oldV, String newV) -> opinionModifier.setName(newV));
+    this.opinionSpinner.getValueFactory().valueProperty().addListener((ObservableValue<? extends Integer> observable, Integer oldValue, Integer newValue) -> {
+      if (newValue != null) {
+        opinionModifier.setOpinion(newValue);
+      } else {
+        this.opinionSpinner.getValueFactory().setValue(0);
+      }
+    });
+    this.durationSpinner.getValueFactory().valueProperty().addListener((ObservableValue<? extends Integer> o, Integer oldV, Integer newV) -> opinionModifier.setDuration(newV));
+    this.prisonReasonCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setPrisonReason(newV));
+    this.banishReasonCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setBanishReason(newV));
+    this.executeReasonCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setExecuteReason(newV));
+    this.revokeReasonCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setRevokeReason(newV));
+    this.divorceReasonCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setDivorceReason(newV));
+    this.inheritCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setInherited(newV));
+    this.crimeCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setCrime(newV));
+    this.enemyCheckBox.selectedProperty().addListener((ObservableValue<? extends Boolean> o, Boolean oldV, Boolean newV) -> opinionModifier.setEnemy(newV));
+    LOG.exit();
   }
 
 }
