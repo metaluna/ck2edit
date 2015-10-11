@@ -24,12 +24,11 @@
 package io.github.metaluna.ck2edit.gui.mod;
 
 import io.github.metaluna.ck2edit.business.mod.ModFile;
-import java.nio.file.Path;
+import java.util.Objects;
 import java.util.function.Consumer;
-import javafx.event.ActionEvent;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,30 +36,61 @@ import org.apache.logging.log4j.Logger;
 class ModTreeCell extends TreeCell<Object> {
 
   public ModTreeCell(Consumer<ModFile> openHandler) {
+    LOG.entry(openHandler);
+    this.openHandler = Objects.requireNonNull(openHandler);
     this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
       if (event.getClickCount() == 2) {
-        open(openHandler);
+        open();
       }
     });
-
+    
+    this.fileContextMenu = createContextMenu();
+    LOG.exit();
   }
 
   @Override
   protected void updateItem(Object item, boolean empty) {
     super.updateItem(item, empty);
     LOG.entry(item, empty);
-    setText(item == null ? "" : item.toString());
+    if (empty || item == null) {
+      setText(null);
+      setGraphic(null);
+    } else {
+      setText(item.toString());
+      if (isFile(item)) {
+        setContextMenu(this.fileContextMenu);
+      }
+    }
     LOG.exit();
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
+  private final Consumer<ModFile> openHandler;
+  private final ContextMenu fileContextMenu;
 
-  private void open(Consumer<ModFile> openHandler) {
-    LOG.entry(openHandler);
-    if (this.getTreeItem() != null && this.getTreeItem().getValue() instanceof ModFile) {
-      openHandler.accept((ModFile) this.getTreeItem().getValue());
+  private void open() {
+    LOG.entry();
+    if (getTreeItem() != null && isFile(getTreeItem().getValue())) {
+      this.openHandler.accept((ModFile) this.getTreeItem().getValue());
     }
     LOG.exit();
   }
+
+  private boolean isFile(Object item) {
+    return item instanceof ModFile;
+  }
+
+  private ContextMenu createContextMenu() {
+    LOG.entry();
+    final ContextMenu result = new ContextMenu();
+
+    MenuItem openMenuItem = new MenuItem("Open");
+    openMenuItem.setOnAction(e -> open());
+    
+    result.getItems().add(openMenuItem);
+    
+    return LOG.exit(result);
+  };
+
 }
