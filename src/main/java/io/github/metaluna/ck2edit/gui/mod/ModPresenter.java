@@ -29,11 +29,15 @@ import io.github.metaluna.ck2edit.business.mod.ModFile;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
 import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersPresenter;
 import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersView;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -48,7 +52,7 @@ import org.apache.logging.log4j.Logger;
 public class ModPresenter {
 
   public void initialize() {
-    this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen));
+    this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen, this::onModFileDelete));
     // defined here because tree cells don't receive any key events
     this.modTreeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
       if (event.getCode() == KeyCode.ENTER) {
@@ -72,9 +76,9 @@ public class ModPresenter {
 
   public void saveFile() {
     LOG.entry();
-    if (this.currentFile instanceof OpinionModifierFile) {
-      modFactory.saveFile((OpinionModifierFile) this.currentFile);
-    }
+    this.currentFile
+            .filter(f -> f instanceof OpinionModifierFile)
+            .ifPresent(f -> modFactory.saveFile((OpinionModifierFile) f));
     LOG.exit();
   }
 
@@ -97,17 +101,28 @@ public class ModPresenter {
   @FXML
   private BorderPane modOpenFilesPane;
 
-  private Optional<Mod> currentMod;
-  private ModFile currentFile;
+  private Optional<Mod> currentMod = Optional.empty();
+  private Optional<ModFile> currentFile = Optional.empty();
   private String baseTitle;
 
   private void onModFileOpen(ModFile modFile) {
     LOG.entry(modFile);
-    this.currentFile = modFile;
+    this.currentFile = Optional.of(modFile);
     OpinionModifiersView view = new OpinionModifiersView();
     OpinionModifiersPresenter presenter = (OpinionModifiersPresenter) view.getPresenter();
     presenter.load((OpinionModifierFile) modFile);
     this.modOpenFilesPane.setCenter(view.getView());
+    LOG.exit();
+  }
+
+  private void onModFileDelete(ModFile modFile) {
+    LOG.entry(modFile);
+    if (showConfirmationDialog(modFile)) {
+      deleteFile(modFile);
+      removeFileFromTree(this.modTreeView.getRoot(), modFile);
+      closeOpenFile(modFile);
+      this.currentFile = Optional.empty();
+    }
     LOG.exit();
   }
 
@@ -145,5 +160,65 @@ public class ModPresenter {
 
   private Optional<Stage> getStage() {
     return Optional.ofNullable((Stage) centerSplitPane.getScene().getWindow());
+  }
+
+  private boolean showConfirmationDialog(ModFile modFile) {
+    LOG.entry(modFile);
+    boolean result;
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setHeaderText(String.format("Deleting the file %s", modFile));
+    alert.setContentText("Do you really want to delete this file? This cannot be undone.");
+    Optional<ButtonType> answer = alert.showAndWait();
+    if (answer.isPresent() && answer.get() == ButtonType.OK) {
+      result = true;
+    } else {
+      result = false;
+    }
+    return LOG.exit(result);
+  }
+
+  private void deleteFile(ModFile modFile) {
+    LOG.entry(modFile);
+    try {
+      Files.delete(modFile.getPath());
+    } catch (IOException ex) {
+      LOG.catching(ex);
+    }
+    LOG.exit();
+  }
+
+  private boolean removeFileFromTree(TreeItem<Object> node, ModFile modFile) {
+    LOG.entry(node, modFile);
+    // only check leaves
+    if (node.isLeaf()) {
+      // found it!
+      if (node.getValue() == modFile) {
+        node.getParent().getChildren().remove(node);
+        return LOG.exit(true);
+      } else {
+        return LOG.exit(false);
+      }
+    } else {
+      // check all children
+      for (TreeItem<Object> child : node.getChildren()) {
+        boolean isFound = removeFileFromTree(child, modFile);
+        if (isFound) {
+          return LOG.exit(true);
+        }
+      }
+      // nothing found in this branch
+      return LOG.exit(false);
+    }
+  }
+
+  private void closeOpenFile(ModFile modFile) {
+    LOG.entry(modFile);
+    this.currentFile
+            .filter(f -> f == modFile)
+            .ifPresent(f -> {
+              LOG.trace("Closing view of opened mod file '%s'", f);
+              this.modOpenFilesPane.setCenter(null);
+            });
+    LOG.exit();
   }
 }

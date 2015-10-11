@@ -35,15 +35,15 @@ import org.apache.logging.log4j.Logger;
 
 class ModTreeCell extends TreeCell<Object> {
 
-  public ModTreeCell(Consumer<ModFile> openHandler) {
-    LOG.entry(openHandler);
+  public ModTreeCell(Consumer<ModFile> openHandler, Consumer<ModFile> deleteHandler) {
+    LOG.entry(openHandler, deleteHandler);
     this.openHandler = Objects.requireNonNull(openHandler);
     this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
       if (event.getClickCount() == 2) {
         open();
       }
     });
-    
+    this.deleteHandler = Objects.requireNonNull(deleteHandler);
     this.fileContextMenu = createContextMenu();
     LOG.exit();
   }
@@ -67,6 +67,7 @@ class ModTreeCell extends TreeCell<Object> {
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
   private final Consumer<ModFile> openHandler;
+  private final Consumer<ModFile> deleteHandler;
   private final ContextMenu fileContextMenu;
 
   private void open() {
@@ -87,8 +88,11 @@ class ModTreeCell extends TreeCell<Object> {
 
     MenuItem openMenuItem = new MenuItem("Open");
     openMenuItem.setOnAction(e -> open());
-    
     result.getItems().add(openMenuItem);
+    
+    MenuItem deleteMenuItem = new MenuItem("Delete");
+    deleteMenuItem.setOnAction(e -> deleteHandler.accept((ModFile) this.getTreeItem().getValue()));
+    result.getItems().add(deleteMenuItem);
     
     return LOG.exit(result);
   };
