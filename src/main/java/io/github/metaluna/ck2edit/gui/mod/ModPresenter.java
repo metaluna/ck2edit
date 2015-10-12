@@ -28,7 +28,10 @@ import io.github.metaluna.ck2edit.business.mod.Mod;
 import io.github.metaluna.ck2edit.business.mod.ModFile;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
 import io.github.metaluna.ck2edit.gui.mod.opinionmodifier.OpinionModifierTreeItem;
+import io.github.metaluna.ck2edit.util.GamePaths;
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +39,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
@@ -49,7 +53,8 @@ import org.apache.logging.log4j.Logger;
 public class ModPresenter {
 
   public void initialize() {
-    this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen, this::onModFileDelete));
+    this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen, 
+            this::onModFileDelete, this::onModFileAdd));
     // defined here because tree cells don't receive any key events
     this.modTreeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
       if (event.getCode() == KeyCode.ENTER) {
@@ -87,6 +92,7 @@ public class ModPresenter {
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
+  private static final String CAT_OPINION_MODIFIERS = "Opinion Modifiers";
 
   @Inject
   private ModManager modManager;
@@ -121,12 +127,24 @@ public class ModPresenter {
     LOG.exit();
   }
 
+  private void onModFileAdd(CategoryTreeItem categoryItem) {
+    LOG.entry(categoryItem);
+    if (categoryItem.getValue().equals(CAT_OPINION_MODIFIERS)) {
+      Optional<String> name = showFileNameDialog();
+      if (name.isPresent() && !name.get().isEmpty()) {
+        OpinionModifierFile modFile = addFileToMod(name.get(), this.currentMod.get());
+        addFileToTree(categoryItem, modFile);
+      }
+    }
+    LOG.exit();
+  }
+  
   private void loadTreeFromMod(Mod mod) {
     final TreeItem<Object> root = new TreeItem<>(mod.getName());
 
     List<ModFile> opinionModifiers = mod.getOpinionModifiers();
     if (!opinionModifiers.isEmpty()) {
-      TreeItem<Object> opinionModifierRoot = new TreeItem<>("Opinion Modifiers");
+      CategoryTreeItem opinionModifierRoot = new CategoryTreeItem(CAT_OPINION_MODIFIERS);
       opinionModifierRoot.setExpanded(true);
       opinionModifierRoot.getChildren().addAll(opinionModifiers.stream()
               .map(m -> new OpinionModifierTreeItem((OpinionModifierFile) m))
@@ -204,6 +222,32 @@ public class ModPresenter {
               LOG.trace("Closing view of opened mod file '%s'", f);
               this.modOpenFilesPane.setCenter(null);
             });
+    LOG.exit();
+  }
+
+  private Optional<String> showFileNameDialog() {
+   LOG.entry();
+   TextInputDialog dialog = new TextInputDialog();
+   dialog.setHeaderText("File name");
+   dialog.setContentText("Please enter the name of the new file:");
+   Optional<String> result = dialog.showAndWait();
+   return LOG.exit(result);
+  }
+
+  private OpinionModifierFile addFileToMod(String name, Mod mod) {
+    LOG.entry(name, mod);
+    String modPath = mod.getPath().replace("\"", "");
+    String categoryPath = "common" + File.separator + "opinion_modifiers";
+    Path path = GamePaths.getModDirectory().getParent()
+            .resolve(modPath).resolve(categoryPath).resolve(name);
+    OpinionModifierFile result = new OpinionModifierFile(path);
+    mod.addOpinionModifier(result);
+    return LOG.exit(result);
+  }
+
+  private void addFileToTree(TreeItem<Object> parent, OpinionModifierFile modFile) {
+    LOG.entry(parent, modFile);
+    parent.getChildren().add(new OpinionModifierTreeItem(modFile));
     LOG.exit();
   }
 }

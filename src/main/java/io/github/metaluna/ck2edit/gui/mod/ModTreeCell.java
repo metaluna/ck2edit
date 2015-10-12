@@ -28,14 +28,16 @@ import java.util.function.Consumer;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class ModTreeCell extends TreeCell<Object> {
 
-  public ModTreeCell(Consumer<ModFileTreeItem> openHandler, Consumer<ModFileTreeItem> deleteHandler) {
-    LOG.entry(openHandler, deleteHandler);
+  public ModTreeCell(Consumer<ModFileTreeItem> openHandler, Consumer<ModFileTreeItem> deleteHandler
+  , Consumer<CategoryTreeItem> addHandler) {
+    LOG.entry(openHandler, deleteHandler, addHandler);
     this.openHandler = Objects.requireNonNull(openHandler);
     this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
       if (event.getClickCount() == 2) {
@@ -43,6 +45,7 @@ class ModTreeCell extends TreeCell<Object> {
       }
     });
     this.deleteHandler = Objects.requireNonNull(deleteHandler);
+    this.addHandler = Objects.requireNonNull(addHandler);
     LOG.exit();
   }
 
@@ -56,6 +59,8 @@ class ModTreeCell extends TreeCell<Object> {
     } else {
       if (isFile(this.getTreeItem())) {
         setContextMenu(createContextMenu());
+      } else if (isCategory(this.getTreeItem())) {
+        setContextMenu(createCategoryContextMenu());
       }
       setText(item.toString());
     }
@@ -66,6 +71,7 @@ class ModTreeCell extends TreeCell<Object> {
   private static final Logger LOG = LogManager.getFormatterLogger();
   private final Consumer<ModFileTreeItem> openHandler;
   private final Consumer<ModFileTreeItem> deleteHandler;
+  private final Consumer<CategoryTreeItem> addHandler;
 
   private void open() {
     LOG.entry();
@@ -75,9 +81,15 @@ class ModTreeCell extends TreeCell<Object> {
     LOG.exit();
   }
 
-  private boolean isFile(Object item) {
-    LOG.entry(item);
-    boolean result = item instanceof ModFileTreeItem;
+  private boolean isFile(TreeItem treeItem) {
+    LOG.entry(treeItem);
+    boolean result = treeItem instanceof ModFileTreeItem;
+    return LOG.exit(result);
+  }
+
+  private boolean isCategory(TreeItem treeItem) {
+    LOG.entry(treeItem);
+    boolean result = treeItem instanceof CategoryTreeItem;
     return LOG.exit(result);
   }
 
@@ -94,6 +106,17 @@ class ModTreeCell extends TreeCell<Object> {
     result.getItems().add(deleteMenuItem);
     
     return LOG.exit(result);
-  };
+  }
+
+  private ContextMenu createCategoryContextMenu() {
+    LOG.entry();
+    final ContextMenu result = new ContextMenu();
+
+    MenuItem addMenuItem = new MenuItem("New file...");
+    addMenuItem.setOnAction(e -> addHandler.accept((CategoryTreeItem) this.getTreeItem()));
+    result.getItems().add(addMenuItem);
+    
+    return LOG.exit(result);
+  }
 
 }
