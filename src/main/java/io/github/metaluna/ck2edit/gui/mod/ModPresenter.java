@@ -140,12 +140,10 @@ public class ModPresenter {
 
   private void setWindowTitle(String name) {
     Stage stage;
-    try {
-      stage = getStage().get();
-    } catch (Exception e) {
-      LOG.catching(e);
+    if (!getStage().isPresent()) {
       return;
     }
+    stage = getStage().get();
 
     if (baseTitle == null) {
       baseTitle = stage.getTitle();
@@ -154,7 +152,13 @@ public class ModPresenter {
   }
 
   private Optional<Stage> getStage() {
-    return Optional.ofNullable((Stage) centerSplitPane.getScene().getWindow());
+    Optional<Stage> result;
+    try {
+      result = Optional.ofNullable((Stage) centerSplitPane.getScene().getWindow());
+    } catch (Exception e) {
+      result = Optional.empty();
+    }
+    return result;
   }
 
   private boolean showConfirmationDialog(ModFile modFile) {
@@ -164,11 +168,7 @@ public class ModPresenter {
     alert.setHeaderText(String.format("Deleting the file %s", modFile));
     alert.setContentText("Do you really want to delete this file? This cannot be undone.");
     Optional<ButtonType> answer = alert.showAndWait();
-    if (answer.isPresent() && answer.get() == ButtonType.OK) {
-      result = true;
-    } else {
-      result = false;
-    }
+    result = answer.isPresent() && answer.get() == ButtonType.OK;
     return LOG.exit(result);
   }
 
