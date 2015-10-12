@@ -23,7 +23,6 @@
  */
 package io.github.metaluna.ck2edit.gui.mod;
 
-import io.github.metaluna.ck2edit.business.mod.ModFile;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javafx.scene.control.ContextMenu;
@@ -35,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 
 class ModTreeCell extends TreeCell<Object> {
 
-  public ModTreeCell(Consumer<ModFile> openHandler, Consumer<ModFile> deleteHandler) {
+  public ModTreeCell(Consumer<ModFileTreeItem> openHandler, Consumer<ModFileTreeItem> deleteHandler) {
     LOG.entry(openHandler, deleteHandler);
     this.openHandler = Objects.requireNonNull(openHandler);
     this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -44,42 +43,42 @@ class ModTreeCell extends TreeCell<Object> {
       }
     });
     this.deleteHandler = Objects.requireNonNull(deleteHandler);
-    this.fileContextMenu = createContextMenu();
     LOG.exit();
   }
 
   @Override
   protected void updateItem(Object item, boolean empty) {
-    super.updateItem(item, empty);
     LOG.entry(item, empty);
+    super.updateItem(item, empty);
     if (empty || item == null) {
       setText(null);
       setGraphic(null);
     } else {
-      setText(item.toString());
-      if (isFile(item)) {
-        setContextMenu(this.fileContextMenu);
+      if (isFile(this.getTreeItem())) {
+        setContextMenu(createContextMenu());
       }
+      setText(item.toString());
     }
     LOG.exit();
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
-  private final Consumer<ModFile> openHandler;
-  private final Consumer<ModFile> deleteHandler;
-  private final ContextMenu fileContextMenu;
+  private final Consumer<ModFileTreeItem> openHandler;
+  private final Consumer<ModFileTreeItem> deleteHandler;
 
   private void open() {
     LOG.entry();
-    if (getTreeItem() != null && isFile(getTreeItem().getValue())) {
-      this.openHandler.accept((ModFile) this.getTreeItem().getValue());
+    if (isFile(this.getTreeItem())) {
+      this.openHandler.accept((ModFileTreeItem) this.getTreeItem());
     }
     LOG.exit();
   }
 
   private boolean isFile(Object item) {
-    return item instanceof ModFile;
+    LOG.entry(item);
+    boolean result = item instanceof ModFileTreeItem;
+    return LOG.exit(result);
   }
 
   private ContextMenu createContextMenu() {
@@ -91,7 +90,7 @@ class ModTreeCell extends TreeCell<Object> {
     result.getItems().add(openMenuItem);
     
     MenuItem deleteMenuItem = new MenuItem("Delete");
-    deleteMenuItem.setOnAction(e -> deleteHandler.accept((ModFile) this.getTreeItem().getValue()));
+    deleteMenuItem.setOnAction(e -> deleteHandler.accept((ModFileTreeItem) this.getTreeItem()));
     result.getItems().add(deleteMenuItem);
     
     return LOG.exit(result);

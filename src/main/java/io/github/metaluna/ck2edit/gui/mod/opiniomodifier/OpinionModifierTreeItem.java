@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2015 Simon Hardijanto.
@@ -21,44 +21,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.business.mod;
+package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
 
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierManager;
-import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import javax.inject.Inject;
+import io.github.metaluna.ck2edit.gui.mod.ModFileTreeItem;
+import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ModManager {
+public class OpinionModifierTreeItem extends ModFileTreeItem {
 
-  public Mod fromFile(Path modFile) {
-    return new ModReader(modFile, parserFactory.fromFile(modFile), new OpinionModifierManager(parserFactory)).read();
-  }
-  
-  public void saveFile(OpinionModifierFile omFile) {
+  public OpinionModifierTreeItem(OpinionModifierFile omFile) {
+    super(omFile);
     LOG.entry(omFile);
-    new OpinionModifierManager(parserFactory).saveFile(omFile);
+    this.omFile = Objects.requireNonNull(omFile);
     LOG.exit();
   }
 
-  public void deleteFile(ModFile modFile) {
-    LOG.entry(modFile);
-    try {
-      Files.delete(modFile.getPath());
-    } catch (IOException ex) {
-      LOG.catching(ex);
-    }
-    LOG.exit();
+  @Override
+  public OpinionModifierFile getFile() {
+    LOG.entry();
+    return LOG.exit(this.omFile);
   }
-  
-  // ---vvv--- PACKAGE-PRIVATE ---vvv---
+
+  @Override
+  public OpinionModifiersView createView() {
+    LOG.entry();
+    OpinionModifiersView result = new OpinionModifiersView();
+    OpinionModifiersPresenter presenter = result.getPresenter();
+    presenter.load(this.omFile);
+    return LOG.exit(result);
+  }
+
+  @Override
+  public String toString() {
+    return "OpinionModifierTreeItem{" + "omFile=" + omFile + '}';
+  }
+
+  // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
   
-  @Inject
-  ParserFactory parserFactory;
-  
+  private final OpinionModifierFile omFile;
 }

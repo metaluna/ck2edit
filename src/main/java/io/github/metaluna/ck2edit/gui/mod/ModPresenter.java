@@ -27,10 +27,7 @@ import io.github.metaluna.ck2edit.business.mod.ModManager;
 import io.github.metaluna.ck2edit.business.mod.Mod;
 import io.github.metaluna.ck2edit.business.mod.ModFile;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersPresenter;
-import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersView;
-import java.io.IOException;
-import java.nio.file.Files;
+import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifierTreeItem;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -56,10 +53,10 @@ public class ModPresenter {
     // defined here because tree cells don't receive any key events
     this.modTreeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
       if (event.getCode() == KeyCode.ENTER) {
+        LOG.trace("ENTER key pressed");
         TreeItem<Object> selected = this.modTreeView.getSelectionModel().getSelectedItem();
-        if (selected.getValue() instanceof ModFile) {
-          ModFile modFile = (ModFile) selected.getValue();
-          onModFileOpen(modFile);
+        if (selected instanceof ModFileTreeItem) {
+          onModFileOpen((ModFileTreeItem) selected);
         }
       }
     });
@@ -68,7 +65,7 @@ public class ModPresenter {
   public void load(Path modFile) {
     Mod mod;
     LOG.info("Loading mod file '%s'...", modFile.toString());
-    mod = modFactory.fromFile(modFile);
+    mod = modManager.fromFile(modFile);
     this.currentMod = Optional.of(mod);
     setWindowTitle(mod.getName());
     loadTreeFromMod(mod);
@@ -78,7 +75,7 @@ public class ModPresenter {
     LOG.entry();
     this.currentFile
             .filter(f -> f instanceof OpinionModifierFile)
-            .ifPresent(f -> modFactory.saveFile((OpinionModifierFile) f));
+            .ifPresent(f -> modManager.saveFile((OpinionModifierFile) f));
     LOG.exit();
   }
 
@@ -92,7 +89,7 @@ public class ModPresenter {
   private static final Logger LOG = LogManager.getFormatterLogger();
 
   @Inject
-  private ModManager modFactory;
+  private ModManager modManager;
 
   @FXML
   private SplitPane centerSplitPane;
@@ -105,23 +102,21 @@ public class ModPresenter {
   private Optional<ModFile> currentFile = Optional.empty();
   private String baseTitle;
 
-  private void onModFileOpen(ModFile modFile) {
-    LOG.entry(modFile);
-    this.currentFile = Optional.of(modFile);
-    OpinionModifiersView view = new OpinionModifiersView();
-    OpinionModifiersPresenter presenter = (OpinionModifiersPresenter) view.getPresenter();
-    presenter.load((OpinionModifierFile) modFile);
-    this.modOpenFilesPane.setCenter(view.getView());
+  private void onModFileOpen(ModFileTreeItem modFileItem) {
+    LOG.entry(modFileItem);
+    this.currentFile = Optional.of(modFileItem.getFile());
+    this.modOpenFilesPane.setCenter(modFileItem.createView().getView());
     LOG.exit();
   }
 
-  private void onModFileDelete(ModFile modFile) {
-    LOG.entry(modFile);
+  private void onModFileDelete(ModFileTreeItem modFileItem) {
+    LOG.entry(modFileItem);
+    ModFile modFile = modFileItem.getFile();
     if (showConfirmationDialog(modFile)) {
-      deleteFile(modFile);
-      removeFileFromTree(this.modTreeView.getRoot(), modFile);
+      removeFileFromTree(this.modTreeView.getRoot(), modFileItem);
       closeOpenFile(modFile);
       this.currentFile = Optional.empty();
+      modManager.deleteFile(modFile);
     }
     LOG.exit();
   }
@@ -134,7 +129,7 @@ public class ModPresenter {
       TreeItem<Object> opinionModifierRoot = new TreeItem<>("Opinion Modifiers");
       opinionModifierRoot.setExpanded(true);
       opinionModifierRoot.getChildren().addAll(opinionModifiers.stream()
-              .map(m -> new TreeItem<Object>(m))
+              .map(m -> new OpinionModifierTreeItem((OpinionModifierFile) m))
               .collect(Collectors.toList())
       );
       root.getChildren().add(opinionModifierRoot);
@@ -177,22 +172,12 @@ public class ModPresenter {
     return LOG.exit(result);
   }
 
-  private void deleteFile(ModFile modFile) {
-    LOG.entry(modFile);
-    try {
-      Files.delete(modFile.getPath());
-    } catch (IOException ex) {
-      LOG.catching(ex);
-    }
-    LOG.exit();
-  }
-
-  private boolean removeFileFromTree(TreeItem<Object> node, ModFile modFile) {
-    LOG.entry(node, modFile);
+  private boolean removeFileFromTree(TreeItem<Object> node, ModFileTreeItem modFileItem) {
+    LOG.entry(node, modFileItem);
     // only check leaves
     if (node.isLeaf()) {
       // found it!
-      if (node.getValue() == modFile) {
+      if (node == modFileItem) {
         node.getParent().getChildren().remove(node);
         return LOG.exit(true);
       } else {
@@ -201,7 +186,7 @@ public class ModPresenter {
     } else {
       // check all children
       for (TreeItem<Object> child : node.getChildren()) {
-        boolean isFound = removeFileFromTree(child, modFile);
+        boolean isFound = removeFileFromTree(child, modFileItem);
         if (isFound) {
           return LOG.exit(true);
         }

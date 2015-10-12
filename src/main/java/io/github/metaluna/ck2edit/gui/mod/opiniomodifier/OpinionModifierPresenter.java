@@ -24,9 +24,7 @@
 package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
 
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WeakChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;

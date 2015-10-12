@@ -21,14 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
+package io.github.metaluna.ck2edit.gui.mod;
 
 import com.airhacks.afterburner.views.FXMLView;
+import io.github.metaluna.ck2edit.business.mod.ModFile;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
-public class OpinionModifiersView extends FXMLView {
+/**
+ * Encapsulates a {@link ModFile} and offers methods to generate a view.
+ */
+public abstract class ModFileTreeItem extends TreeItem<Object> {
   
-  @Override
-  public OpinionModifiersPresenter getPresenter() {
-    return (OpinionModifiersPresenter) super.getPresenter();
+  /**
+   * Minimal constructor needed to initialize the tree item event listeners.
+   * @param modFile the mod file inside this tree item
+   */
+  public ModFileTreeItem(ModFile modFile) {
+    super(modFile);
   }
+  
+  /**
+   * @return a new FXMLView
+   */
+  public abstract FXMLView createView();
+  
+  /**
+   * @return the file contained in this tree item
+   */
+  public abstract ModFile getFile();
+
+  @Override
+  public ObservableList<TreeItem<Object>> getChildren() {
+    return FXCollections.emptyObservableList();
+  }
+
+  @Override
+  public boolean isLeaf() {
+    return true;
+  }
+  
+  
 }
