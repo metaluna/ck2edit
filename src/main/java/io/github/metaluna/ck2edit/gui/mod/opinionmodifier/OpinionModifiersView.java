@@ -21,32 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
+package io.github.metaluna.ck2edit.gui.mod.opinionmodifier;
 
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
-import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import javafx.fxml.FXML;
-import javafx.scene.layout.VBox;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.airhacks.afterburner.views.FXMLView;
 
-public class OpinionModifiersPresenter {
-
-  public void load(OpinionModifierFile file) {
-    LOG.entry(file);
-    for (OpinionModifier om : file.getOpinionModifiers()) {
-      OpinionModifierView omView = new OpinionModifierView();
-      OpinionModifierPresenter omPresenter = (OpinionModifierPresenter) omView.getPresenter();
-      omPresenter.setOpinionModifier(om);
-      root.getChildren().add(omView.getView());
-    }
-    LOG.exit();
-  }
-
-  // ---vvv--- PRIVATE ---vvv---
-  private static final Logger LOG = LogManager.getFormatterLogger();
+public class OpinionModifiersView extends FXMLView {
   
-  @FXML
-  private VBox root;
-
+  @Override
+  public OpinionModifiersPresenter getPresenter() {
+    return (OpinionModifiersPresenter) super.getPresenter();
+  }
 }

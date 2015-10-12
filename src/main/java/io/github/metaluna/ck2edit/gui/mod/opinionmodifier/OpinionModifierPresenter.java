@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
+package io.github.metaluna.ck2edit.gui.mod.opinionmodifier;
 
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
 import javafx.beans.value.ObservableValue;

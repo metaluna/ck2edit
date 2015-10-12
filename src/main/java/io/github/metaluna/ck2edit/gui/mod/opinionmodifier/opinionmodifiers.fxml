@@ -7,7 +7,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifiersPresenter">
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.metaluna.ck2edit.gui.mod.opinionmodifier.OpinionModifiersPresenter">
    <content>
       <VBox fx:id="root" spacing="4.0">
          <padding>

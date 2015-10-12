@@ -27,7 +27,7 @@ import io.github.metaluna.ck2edit.business.mod.ModManager;
 import io.github.metaluna.ck2edit.business.mod.Mod;
 import io.github.metaluna.ck2edit.business.mod.ModFile;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import io.github.metaluna.ck2edit.gui.mod.opiniomodifier.OpinionModifierTreeItem;
+import io.github.metaluna.ck2edit.gui.mod.opinionmodifier.OpinionModifierTreeItem;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;

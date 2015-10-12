@@ -21,45 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
+package io.github.metaluna.ck2edit.gui.mod.opinionmodifier;
 
+import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifier;
 import io.github.metaluna.ck2edit.business.mod.opinionmodifier.OpinionModifierFile;
-import io.github.metaluna.ck2edit.gui.mod.ModFileTreeItem;
-import java.util.Objects;
+import javafx.fxml.FXML;
+import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OpinionModifierTreeItem extends ModFileTreeItem {
+public class OpinionModifiersPresenter {
 
-  public OpinionModifierTreeItem(OpinionModifierFile omFile) {
-    super(omFile);
-    LOG.entry(omFile);
-    this.omFile = Objects.requireNonNull(omFile);
+  public void load(OpinionModifierFile file) {
+    LOG.entry(file);
+    for (OpinionModifier om : file.getOpinionModifiers()) {
+      OpinionModifierView omView = new OpinionModifierView();
+      OpinionModifierPresenter omPresenter = (OpinionModifierPresenter) omView.getPresenter();
+      omPresenter.setOpinionModifier(om);
+      root.getChildren().add(omView.getView());
+    }
     LOG.exit();
-  }
-
-  @Override
-  public OpinionModifierFile getFile() {
-    LOG.entry();
-    return LOG.exit(this.omFile);
-  }
-
-  @Override
-  public OpinionModifiersView createView() {
-    LOG.entry();
-    OpinionModifiersView result = new OpinionModifiersView();
-    OpinionModifiersPresenter presenter = result.getPresenter();
-    presenter.load(this.omFile);
-    return LOG.exit(result);
-  }
-
-  @Override
-  public String toString() {
-    return "OpinionModifierTreeItem{" + "omFile=" + omFile + '}';
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
   
-  private final OpinionModifierFile omFile;
+  @FXML
+  private VBox root;
+
 }

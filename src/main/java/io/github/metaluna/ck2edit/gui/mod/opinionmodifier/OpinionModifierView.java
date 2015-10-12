@@ -21,14 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.gui.mod.opiniomodifier;
+
+package io.github.metaluna.ck2edit.gui.mod.opinionmodifier;
 
 import com.airhacks.afterburner.views.FXMLView;
 
-public class OpinionModifiersView extends FXMLView {
-  
-  @Override
-  public OpinionModifiersPresenter getPresenter() {
-    return (OpinionModifiersPresenter) super.getPresenter();
-  }
+public class OpinionModifierView extends FXMLView {
+
 }
