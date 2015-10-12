@@ -24,6 +24,7 @@
 package io.github.metaluna.ck2edit.gui.mod;
 
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -36,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 class ModTreeCell extends TreeCell<Object> {
 
   public ModTreeCell(Consumer<ModFileTreeItem> openHandler, Consumer<ModFileTreeItem> deleteHandler
-  , Consumer<CategoryTreeItem> addHandler) {
+  , Consumer<CategoryTreeItem> addHandler, ResourceBundle resources) {
     LOG.entry(openHandler, deleteHandler, addHandler);
     this.openHandler = Objects.requireNonNull(openHandler);
     this.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -46,6 +47,7 @@ class ModTreeCell extends TreeCell<Object> {
     });
     this.deleteHandler = Objects.requireNonNull(deleteHandler);
     this.addHandler = Objects.requireNonNull(addHandler);
+    this.resources = Objects.requireNonNull(resources);
     LOG.exit();
   }
 
@@ -69,10 +71,11 @@ class ModTreeCell extends TreeCell<Object> {
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
+  private final ResourceBundle resources;
   private final Consumer<ModFileTreeItem> openHandler;
   private final Consumer<ModFileTreeItem> deleteHandler;
   private final Consumer<CategoryTreeItem> addHandler;
-
+  
   private void open() {
     LOG.entry();
     if (isFile(this.getTreeItem())) {
@@ -97,11 +100,11 @@ class ModTreeCell extends TreeCell<Object> {
     LOG.entry();
     final ContextMenu result = new ContextMenu();
 
-    MenuItem openMenuItem = new MenuItem("Open");
+    MenuItem openMenuItem = new MenuItem(resources.getString("contextMenuOpen"));
     openMenuItem.setOnAction(e -> open());
     result.getItems().add(openMenuItem);
     
-    MenuItem deleteMenuItem = new MenuItem("Delete");
+    MenuItem deleteMenuItem = new MenuItem(resources.getString("contextMenuDelete"));
     deleteMenuItem.setOnAction(e -> deleteHandler.accept((ModFileTreeItem) this.getTreeItem()));
     result.getItems().add(deleteMenuItem);
     
@@ -112,7 +115,7 @@ class ModTreeCell extends TreeCell<Object> {
     LOG.entry();
     final ContextMenu result = new ContextMenu();
 
-    MenuItem addMenuItem = new MenuItem("New file...");
+    MenuItem addMenuItem = new MenuItem(resources.getString("contextMenuNewFile"));
     addMenuItem.setOnAction(e -> addHandler.accept((CategoryTreeItem) this.getTreeItem()));
     result.getItems().add(addMenuItem);
     

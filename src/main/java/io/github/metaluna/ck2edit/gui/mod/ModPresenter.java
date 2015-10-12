@@ -31,9 +31,9 @@ import io.github.metaluna.ck2edit.gui.mod.opinionmodifier.OpinionModifierTreeIte
 import io.github.metaluna.ck2edit.util.GamePaths;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -54,7 +54,7 @@ public class ModPresenter {
 
   public void initialize() {
     this.modTreeView.setCellFactory(treeView -> new ModTreeCell(this::onModFileOpen, 
-            this::onModFileDelete, this::onModFileAdd));
+            this::onModFileDelete, this::onModFileAdd, this.resources));
     // defined here because tree cells don't receive any key events
     this.modTreeView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
       if (event.getCode() == KeyCode.ENTER) {
@@ -97,6 +97,8 @@ public class ModPresenter {
   @Inject
   private ModManager modManager;
 
+  @FXML
+  private ResourceBundle resources;
   @FXML
   private SplitPane centerSplitPane;
   @FXML
@@ -183,8 +185,8 @@ public class ModPresenter {
     LOG.entry(modFile);
     boolean result;
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setHeaderText(String.format("Deleting the file %s", modFile));
-    alert.setContentText("Do you really want to delete this file? This cannot be undone.");
+    alert.setHeaderText(String.format(resources.getString("dialogDeleteFileHeader"), modFile));
+    alert.setContentText(resources.getString("dialogDeleteFileContent"));
     Optional<ButtonType> answer = alert.showAndWait();
     result = answer.isPresent() && answer.get() == ButtonType.OK;
     return LOG.exit(result);
@@ -228,8 +230,8 @@ public class ModPresenter {
   private Optional<String> showFileNameDialog() {
    LOG.entry();
    TextInputDialog dialog = new TextInputDialog();
-   dialog.setHeaderText("File name");
-   dialog.setContentText("Please enter the name of the new file:");
+   dialog.setHeaderText(resources.getString("dialogAddFileHeader"));
+   dialog.setContentText(resources.getString("dialogAddFileContent"));
    Optional<String> result = dialog.showAndWait();
    return LOG.exit(result);
   }

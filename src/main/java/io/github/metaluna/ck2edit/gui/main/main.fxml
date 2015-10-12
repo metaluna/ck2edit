@@ -11,35 +11,35 @@
    <top>
       <MenuBar BorderPane.alignment="TOP_LEFT">
         <menus>
-          <Menu text="_File">
+          <Menu text="%menuFile">
             <items>
-                  <MenuItem onAction="#onOpenFile" text="_Open Mod...">
+                  <MenuItem onAction="#onOpenFile" text="%menuOpenMod">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
                   <SeparatorMenuItem/>
-                  <MenuItem onAction="#onSaveFile" text="_Save">
+                  <MenuItem onAction="#onSaveFile" text="%menuSaveFile">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem onAction="#onSaveAllFiles"  text="Save _All">
+                  <MenuItem onAction="#onSaveAllFiles"  text="%menuSaveAll">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem/>
-              <MenuItem text="_Quit" />
+              <MenuItem text="%menuQuit" />
             </items>
           </Menu>
-          <Menu text="_Edit">
+          <Menu text="%menuEdit">
             <items>
-              <MenuItem disable="true" text="Delete" />
+              <MenuItem disable="true" text="%menuDelete" />
             </items>
           </Menu>
-          <Menu text="_Help">
+          <Menu text="%menuHelp">
             <items>
-              <MenuItem disable="true" text="About" />
+              <MenuItem disable="true" text="%menuAbout" />
             </items>
           </Menu>
         </menus>
