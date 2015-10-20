@@ -35,9 +35,13 @@ import static org.junit.Assert.*;
 public class OpinionModifierFileTest {
 
   private OpinionModifierFile opinionModifierFile;
+  private Path path;
   
   @Before
-  public void setUp() {
+  public void setUp() throws IOException {
+    path = Files.createTempFile(null, null);
+    path.toFile().deleteOnExit();
+    opinionModifierFile = new OpinionModifierFile(path);
   }
 
   @Test(expected = NullPointerException.class)
@@ -47,8 +51,6 @@ public class OpinionModifierFileTest {
   
   @Test
   public void getsName() throws IOException {
-    Path path = Files.createTempFile(null, null);
-    path.toFile().deleteOnExit();
     String expName = path.getFileName().toString();
     opinionModifierFile = new OpinionModifierFile(path);
     assertThat(opinionModifierFile.getName(), is(expName));
@@ -56,12 +58,43 @@ public class OpinionModifierFileTest {
 
   @Test
   public void toStringContainsFileName() throws IOException {
-    Path path = Files.createTempFile(null, null);
-    path.toFile().deleteOnExit();
     String expName = path.getFileName().toString();
     opinionModifierFile = new OpinionModifierFile(path);
     assertThat(opinionModifierFile.toString(), containsString(expName));
     
+  }
+  
+  @Test
+  public void addsValidOpinionModifier() {
+    OpinionModifier modifier = new OpinionModifier("test");
+    opinionModifierFile.add(modifier);
+    
+    assertThat(opinionModifierFile.getOpinionModifiers(), contains(modifier));
+  }
+  
+  @Test
+  public void addsMultipleModifiers() {
+    OpinionModifier modifier = new OpinionModifier("test");
+    opinionModifierFile.add(modifier);
+    OpinionModifier modifier2 = new OpinionModifier("test 2");
+    opinionModifierFile.add(modifier2);
+    
+    assertThat(opinionModifierFile.getOpinionModifiers(), contains(modifier, modifier2));
+  }
+  
+  @Test(expected = NullPointerException.class)
+  public void doesNotAddNullModifier() {
+    opinionModifierFile.add(null);
+  }
+  
+  @Test
+  public void doesNotAddModifierOnceMore() {
+    OpinionModifier modifier = new OpinionModifier("test");
+    opinionModifierFile.add(modifier);
+    
+    opinionModifierFile.add(modifier);
+    
+    assertThat(opinionModifierFile.getOpinionModifiers(), hasSize(1));
   }
 
 }

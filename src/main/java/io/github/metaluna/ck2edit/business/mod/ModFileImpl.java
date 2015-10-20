@@ -21,64 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
-import io.github.metaluna.ck2edit.business.mod.ModFileImpl;
+package io.github.metaluna.ck2edit.business.mod;
+
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * File containing a number of opinion modifiers.
+ * Base class for files with modding contents.
  */
-public class OpinionModifierFile extends ModFileImpl {
+public abstract class ModFileImpl implements ModFile {
 
-  /**
-   * Constructor
-   *
-   * @param path the path to the file
-   */
-  public OpinionModifierFile(Path path) {
-    super(path);
-    LOG.entry();
-    this.opinionModifiers = new ArrayList<>();
+  public ModFileImpl(Path path) {
+    LOG.entry(path);
+    this.path = Objects.requireNonNull(path);
     LOG.exit();
   }
 
-  /**
-   * @return an unmodifiable list of opinion modifiers contained in this file
-   */
-  public List<OpinionModifier> getOpinionModifiers() {
-    return Collections.unmodifiableList(this.opinionModifiers);
+  @Override
+  public Path getPath() {
+    return this.path;
   }
 
-  /**
-   * Adds a new modifier to this file. Must not be <code>null</code>. If a
-   * modifier is added a second time it will be silently ignored.
-   *
-   * @param modifier the modifier to add
-   */
-  public void add(OpinionModifier modifier) {
-    LOG.entry(modifier);
-    Objects.requireNonNull(modifier);
-    if (this.opinionModifiers.contains(modifier)) {
-      LOG.info("Modifier already in this file: %s", modifier);
-    } else {
-      this.opinionModifiers.add(modifier);
-    }
-    LOG.exit();
+  @Override
+  public String getName() {
+    return this.path.getFileName().toString();
+  }
+
+  @Override
+  public String toString() {
+    return this.getName();
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
-
-  /**
-   * the list of opinion modifiers
-   */
-  private final List<OpinionModifier> opinionModifiers;
-
+  
+  /** the path to the file */
+  private final Path path;
 }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
+package io.github.metaluna.ck2edit.business.mod.localisation;
 
 import io.github.metaluna.ck2edit.business.mod.ModFileImpl;
 import java.nio.file.Path;
@@ -33,52 +33,40 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * File containing a number of opinion modifiers.
+ * File containing any number of localisations.
  */
-public class OpinionModifierFile extends ModFileImpl {
+public class LocalisationFile extends ModFileImpl {
 
-  /**
-   * Constructor
-   *
-   * @param path the path to the file
-   */
-  public OpinionModifierFile(Path path) {
+  public LocalisationFile(Path path) {
     super(path);
-    LOG.entry();
-    this.opinionModifiers = new ArrayList<>();
-    LOG.exit();
+    this.localisations = new ArrayList<>();
   }
 
   /**
-   * @return an unmodifiable list of opinion modifiers contained in this file
+   * @return an unmodifiable list of localisations contained in this file
    */
-  public List<OpinionModifier> getOpinionModifiers() {
-    return Collections.unmodifiableList(this.opinionModifiers);
+  public List<Localisation> getLocalisations() {
+    return Collections.unmodifiableList(localisations);
   }
 
   /**
-   * Adds a new modifier to this file. Must not be <code>null</code>. If a
-   * modifier is added a second time it will be silently ignored.
+   * Adds a new localisation to this file. Must not be <code>null</code>. If a
+   * localisation is added a second time it will be silently ignored.
    *
-   * @param modifier the modifier to add
+   * @param localisation the localisation to add
    */
-  public void add(OpinionModifier modifier) {
-    LOG.entry(modifier);
-    Objects.requireNonNull(modifier);
-    if (this.opinionModifiers.contains(modifier)) {
-      LOG.info("Modifier already in this file: %s", modifier);
+  public void add(Localisation localisation) {
+    LOG.entry(localisation);
+    Objects.requireNonNull(localisation);
+    if (this.localisations.contains(localisation)) {
+      LOG.info("Localisation already in this file: %s", localisation);
     } else {
-      this.opinionModifiers.add(modifier);
+      this.localisations.add(localisation);
     }
     LOG.exit();
   }
 
   // ---vvv--- PRIVATE ---vvv---
   private static final Logger LOG = LogManager.getFormatterLogger();
-
-  /**
-   * the list of opinion modifiers
-   */
-  private final List<OpinionModifier> opinionModifiers;
-
+  private final List<Localisation> localisations;
 }
