@@ -98,8 +98,9 @@ public class Localisation {
    * semicolons. If the translation is <code>null</code> it will be replaced by
    * an empty string.
    *
-   * @param language
-   * @param translation
+   * @param language the language to set
+   * @param translation the new translation
+   * @throws IllegalArgumentException if the translation contains a semicolon
    */
   public void setLanguage(Language language, String translation) {
     setLanguage(language.column, translation);
@@ -112,6 +113,7 @@ public class Localisation {
    *
    * @param column the column to set
    * @param translation the new translation
+   * @throws IllegalArgumentException if the translation contains a semicolon
    */
   public void setLanguage(int column, String translation) {
     if (column == ID_COLUMN) {
@@ -127,6 +129,8 @@ public class Localisation {
     }
     if (translation == null) {
       translation = "";
+    } else if (translation.contains(";")) {
+      throw new IllegalArgumentException(String.format("String must not contain semicolons but was '%s' (column: %d)", translation, column));
     }
     this.columns[column] = translation;
 

@@ -107,4 +107,9 @@ public class LocalisationTest {
     localisation.setLanguage(Localisation.Language.FRENCH, null);
     assertThat(localisation.getLanguage(Localisation.Language.FRENCH), is(""));
   }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void doesNotAllowSemicolons() {
+    localisation.setLanguage(Localisation.Language.SPANISH, "bla;blubb");
+  }
 }
