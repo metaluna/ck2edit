@@ -22,32 +22,40 @@
  * THE SOFTWARE.
  */
 
-package io.github.metaluna.ck2edit.support;
+package io.github.metaluna.ck2edit.business.mod.localisation;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import static org.junit.Assert.fail;
+import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class FileLoader {
+/**
+ * Parses localisation lines and produces localisations.
+ */
+class LocalisationParser {
+  
+  public Localisation parseLine(String[] columns) {
+    LOG.entry(Arrays.asList(columns));
+    final Localisation result = new Localisation(columns[0]);
 
-  public static Path fetchFile(String parent, String file) {
-    URL resourceUrl = FileLoader.class.getResource(parent + File.separator + file);
-    if (resourceUrl == null) {
-      fail(String.format("Unable to find file '%s' in directory '%s'. Resource does not exist.", file, parent));
+    for (int i = 1; i < columns.length-1; i++) {
+      String translation = columns[i];
+      
+      if (Localisation.END_MARKER.equals(translation)) {
+        continue;
+      }
+      
+      result.setLanguage(i, translation);
     }
     
-    Path path = null;
-    try {
-      path = Paths.get(resourceUrl.toURI());
-    } catch (URISyntaxException ex) {
-      fail(String.format("Unable to load file '%s'", resourceUrl.toString()));
-    }
-    return path;
+    return LOG.exit(result);
+  }
+  
+  public boolean isComment(String[] columns) {
+    return columns[0].trim().startsWith(COMMENT_MARKER);
   }
 
   // ---vvv--- PRIVATE ---vvv---
-  private FileLoader() {}
+  private static final Logger LOG = LogManager.getFormatterLogger();
+  private static final String COMMENT_MARKER = "#";
+
 }

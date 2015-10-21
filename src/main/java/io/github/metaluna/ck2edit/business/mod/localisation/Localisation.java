@@ -29,6 +29,8 @@ import java.util.Objects;
  * Represents a key with its translations.
  */
 public class Localisation {
+  
+  public static final String END_MARKER = "x";
 
   /**
    * Specifies shortcuts to languages implemented in the base game.
@@ -51,7 +53,7 @@ public class Localisation {
    */
   public Localisation(String id) {
     this.columns[ID_COLUMN] = Objects.requireNonNull(id);
-    this.columns[END_MARKER_COLUMN] = "x";
+    this.columns[END_MARKER_COLUMN] = END_MARKER;
   }
 
   /**
