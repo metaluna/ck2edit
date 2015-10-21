@@ -23,13 +23,9 @@
  */
 package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
-import io.github.metaluna.ck2edit.support.FileLoader;
+import io.github.metaluna.ck2edit.support.FileTestHelpers;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
@@ -43,13 +39,13 @@ public class OpinionModifierWriterTest {
 
   @Before
   public void setUp() throws IOException {
-    Files.createDirectories(TEST_DIR);
+    FileTestHelpers.setUpTestDirectory();
     opinionModifier = createOpinionModifier();
   }
 
   @After
   public void tearDown() {
-    FileUtils.deleteQuietly(TEST_DIR.toFile());
+    FileTestHelpers.tearDownTestDirectory();
   }
 
   @Test(expected = NullPointerException.class)
@@ -66,9 +62,9 @@ public class OpinionModifierWriterTest {
 
     assertTrue(file.getPath().toFile().exists());
 
-    Path expFile = FileLoader.fetchFile("/reader/opinionmodifier", "single_opinion_modifier.txt");
-    String got = readAsString(file.getPath());
-    String exp = readAsString(expFile);
+    Path expFile = FileTestHelpers.fetchFile("reader", "opinionmodifier", "single_opinion_modifier.txt");
+    String got = FileTestHelpers.readAsString(file.getPath());
+    String exp = FileTestHelpers.readAsString(expFile);
     assertEquals(exp, got);
   }
 
@@ -92,7 +88,7 @@ public class OpinionModifierWriterTest {
     
     assertTrue(file.getPath().toFile().exists());
 
-    String got = readAsString(file.getPath());
+    String got = FileTestHelpers.readAsString(file.getPath());
     assertThat(got, containsString(expName));
     assertThat(got, containsString("opinion"));
     assertThat(got, containsString(Integer.toString(expOpinion)));
@@ -109,24 +105,8 @@ public class OpinionModifierWriterTest {
   }
 
   // ---vvv--- PRIVATE ---vvv---
-  private static final Path TEST_DIR = Paths.get(System.getProperty("java.io.tmpdir"), "ck2edit-test");
-
   private Path generateFileName() {
-    String fileName = "opinion_writer_" + System.currentTimeMillis() + ".txt";
-    Path gotFile = TEST_DIR.resolve(fileName);
-    gotFile.toFile().deleteOnExit();
-    return gotFile;
-  }
-
-  private String readAsString(Path gotFile) {
-    String got = null;
-    try {
-      got = new String(Files.readAllBytes(gotFile), Charset.forName("Windows-1252"));
-    } catch (IOException ex) {
-      ex.printStackTrace();
-      fail();
-    }
-    return got;
+    return FileTestHelpers.generateFileName("opinion_writer", "txt");
   }
 
   private OpinionModifier createOpinionModifier() {

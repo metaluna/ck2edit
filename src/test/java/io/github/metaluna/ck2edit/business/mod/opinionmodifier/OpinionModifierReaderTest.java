@@ -25,7 +25,7 @@ package io.github.metaluna.ck2edit.business.mod.opinionmodifier;
 
 import io.github.metaluna.ck2edit.dataaccess.parser.Parser;
 import io.github.metaluna.ck2edit.dataaccess.parser.ParserFactory;
-import io.github.metaluna.ck2edit.support.FileLoader;
+import io.github.metaluna.ck2edit.support.FileTestHelpers;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.Before;
@@ -86,11 +86,11 @@ public class OpinionModifierReaderTest {
 
   // ---vvv--- PRIVATE ---vvv---
   private Path fetchFile(String file) {
-    return FileLoader.fetchFile("/reader/opinionmodifier", file);
+    return FileTestHelpers.fetchFile("reader", "opinionmodifier", file);
   }
 
   private OpinionModifierReader parse(String file) {
-    Path path = FileLoader.fetchFile("/reader/opinionmodifier", file);
+    Path path = FileTestHelpers.fetchFile("reader", "opinionmodifier", file);
     Parser parser = new ParserFactory().fromFile(path);
     return new OpinionModifierReader(path, parser);
   }

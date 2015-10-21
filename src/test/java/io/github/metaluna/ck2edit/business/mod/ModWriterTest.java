@@ -24,7 +24,7 @@
 
 package io.github.metaluna.ck2edit.business.mod;
 
-import io.github.metaluna.ck2edit.support.FileLoader;
+import io.github.metaluna.ck2edit.support.FileTestHelpers;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -73,7 +73,7 @@ public class ModWriterTest {
     
     assertTrue(gotFile.toFile().exists());
     
-    Path expFile = FileLoader.fetchFile("/reader/mod", "complete.mod");
+    Path expFile = FileTestHelpers.fetchFile("reader" , "mod", "complete.mod");
     String got = readAsString(gotFile);
     String exp = readAsString(expFile);
     assertEquals(exp, got);

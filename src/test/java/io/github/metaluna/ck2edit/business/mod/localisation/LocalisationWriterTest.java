@@ -21,58 +21,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package io.github.metaluna.ck2edit.business.mod.localisation;
 
 import io.github.metaluna.ck2edit.support.FileTestHelpers;
+import java.io.IOException;
 import java.nio.file.Path;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-public class LocalisationReaderTest {
+public class LocalisationWriterTest {
 
-  private LocalisationReader reader;
-  private LocalisationParser parser;
-  
+  private LocalisationWriter writer;
+
   @Before
-  public void setUp() {
-    parser = new LocalisationParser();
+  public void setUp() throws IOException {
+    FileTestHelpers.setUpTestDirectory();
   }
-  
-  @Test(expected = NullPointerException.class)
-  public void doesNotCreateWithoutPath() {
-    reader = new LocalisationReader(null, parser);
+
+  @After
+  public void tearDown() {
+    FileTestHelpers.tearDownTestDirectory();
   }
 
   @Test(expected = NullPointerException.class)
-  public void doesNotCreateWithoutParser() {
-    Path file = fetchFile(VALID_FILE);
-    reader = new LocalisationReader(file, null);
+  public void doesNotCreateWithoutLocalisationFile() {
+    writer = new LocalisationWriter(null);
   }
 
   @Test
-  public void readsValidFile() {
-    Path file = fetchFile(VALID_FILE);
-    reader = new LocalisationReader(file, parser);
-    
-    LocalisationFile gotLocalisationFile = reader.read();
-    assertThat(gotLocalisationFile.getLocalisations(), hasSize(1));
-    
-    Localisation localisation = gotLocalisationFile.getLocalisations().get(0);
-    assertThat(localisation.getId(), is("KEY"));
-    assertThat(localisation.getLanguage(Localisation.Language.ENGLISH), is("english column"));
-    assertThat(localisation.getLanguage(Localisation.Language.FRENCH), is("french column"));
-    assertThat(localisation.getLanguage(Localisation.Language.GERMAN), is("german column"));
-    assertThat(localisation.getLanguage(Localisation.Language.SPANISH), is("spanish column"));
-  }
-  
-  // ---vvv--- PRIVATE ---vvv---
-  private static final String VALID_FILE = "valid_localisation.csv";
+  public void createsValidFile() {
+    LocalisationFile file = new LocalisationFile(generateFileName());
+    Localisation localisation = new Localisation("KEY");
+    localisation.setLanguage(Localisation.Language.ENGLISH, "english column");
+    localisation.setLanguage(Localisation.Language.FRENCH, "french column");
+    localisation.setLanguage(Localisation.Language.GERMAN, "german column");
+    localisation.setLanguage(Localisation.Language.SPANISH, "spanish column");
+    file.add(localisation);
 
-  private Path fetchFile(String file) {
-    return FileTestHelpers.fetchFile("reader", "localisation", file);
+    writer = new LocalisationWriter(file);
+    writer.write();
+
+    assertTrue(file.getPath().toFile().exists());
+    
+    Path expFile = FileTestHelpers.fetchFile("reader", "localisation", "valid_localisation.csv");
+    String got = FileTestHelpers.readAsString(file.getPath());
+    String exp = FileTestHelpers.readAsString(expFile);
+    assertEquals(exp, got);    
+  }
+
+  // ---vvv--- PRIVATE ---vvv---
+  private Path generateFileName() {
+    return FileTestHelpers.generateFileName("localisation", "csv");
   }
 
 }
